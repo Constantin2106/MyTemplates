@@ -11,6 +11,11 @@ int Add(int& x)
     x += 1;
     return x;
 }
+int Dev(int& x)
+{
+   x -= 1;
+   return x;
+}
 double Mul(int& x)
 {
     x *= 10;
@@ -29,17 +34,20 @@ void ProcessElementLambda(unsigned idx, LambdaRef<double(int&)> lambda)
 
 void LambdaTest()
 {
+    FuncRef<int(int&)> add = &Add;
+    const FuncRef<double(int&)> mul = &Mul;
+
     for(unsigned i = 0; i < 5; i++)
     {
         std::cout << "Before: " << X[i];
 
-        ProcessElementLambda(i, [&](int& x) -> double
+        /*ProcessElementLambda(i, [&](int& x) -> double
         {
             x++;
             return x;
-        });
+        });*/
 
-        ProcessElementFunction(i, Add);
+        ProcessElementFunction(i, add);
         //ProcessElementFunction(i, Mul);
 
         std::cout << "   After: " << X[i] << std::endl;

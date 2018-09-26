@@ -1,7 +1,7 @@
-#ifndef THREAD
-#define THREAD
+#pragma once
 
 #include <queue>
+#include "Callback/Callback.h"
 
 class TThread
 {
@@ -12,7 +12,7 @@ public:
 	bool Initialize();
 	bool Free();
 
-	unsigned AddTask(void(*_function)(void*), void* _data);
+   unsigned AddTask(FuncRef<void(void*)> function, void* _data);
 	void Run();
 	unsigned GetId() { return id; }
 
@@ -20,7 +20,10 @@ protected:
 	struct Task
 	{
 		void* data;
-		void(*function)(void*);
+      FuncRef<void(void*)> function;
+
+      Task() : function(nullptr), data(nullptr) {}
+      Task(FuncRef<void(void*)> f, void* d) : function(f), data(d) {}
 	};
 
 private:
@@ -32,5 +35,3 @@ private:
 
 	std::queue<Task> tasks;
 };
-
-#endif

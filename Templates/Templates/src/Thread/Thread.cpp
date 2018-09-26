@@ -1,14 +1,14 @@
 #include "Thread.h"
 
 #include <thread>
+#include <utility>
 
 using namespace std;
 
 unsigned TThread::maxThreads = 0;
 unsigned TThread::maxId = 0;
 
-TThread::TThread() :
-terminate(false)
+TThread::TThread() : terminate(false)
 {
 	id = ++maxId;
 
@@ -46,13 +46,9 @@ void TThread::Run()
 	}
 }
 
-unsigned TThread::AddTask(void(*_function)(void*), void* _data)
+unsigned TThread::AddTask(FuncRef<void(void*)> _function, void* _data)
 {
-	Task task;
-	task.data = _data;
-	task.function = _function;
-
-	tasks.push(task);
+   tasks.emplace(_function, _data);
 
 	return (unsigned)tasks.size();
 }

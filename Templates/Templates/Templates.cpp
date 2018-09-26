@@ -29,12 +29,12 @@ using namespace std;
 
 int main()
 {
-	FactoryMethodTest();
+	//FactoryMethodTest();
 	//SingletonTest();
 	//ThreadTest();
     //PImplTest();
     //StrategyTest();
-    //LambdaTest();
+    LambdaTest();
     //VisitorTest();
 	//DelegateTest();
    //MyDelegateTest();

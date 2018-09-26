@@ -8,7 +8,9 @@ template<class R, class... Ts>
 class FuncRef<R(Ts...)>
 {
 public:
+    FuncRef() : m_func(nullptr) {}
     FuncRef(R(*f)(Ts...)) : m_func(f) {}
+
     ~FuncRef() {}
 
     R operator() (Ts... arg) const
@@ -19,10 +21,10 @@ public:
 private:
     R(*m_func)(Ts... arg);
 
-    FuncRef(const FuncRef&) = delete;
+    /*FuncRef(const FuncRef&) = delete;
     FuncRef& operator= (const FuncRef&) = delete;
     FuncRef(FuncRef&&) = delete;
-    FuncRef& operator= (FuncRef&&) = delete;
+    FuncRef& operator= (FuncRef&&) = delete;*/
 };
 
 
