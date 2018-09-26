@@ -7,6 +7,7 @@ class TSingleton
 {
 public:
 	static TSingleton* Instance();
+	static bool Destroy(TSingleton* singleton);
 	~TSingleton() {}
 
 	bool Initialize();

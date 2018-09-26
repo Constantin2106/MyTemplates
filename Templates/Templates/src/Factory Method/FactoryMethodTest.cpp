@@ -5,10 +5,71 @@
 
 using namespace std;
 
+class Class1
+{
+public:
+   Class1(int x, double y) : m_x(x), m_y(y)
+   {};
+
+   std::string GetClassName()
+   {
+      return m_name;
+   }
+   int GetX()
+   {
+      return m_x;
+   }
+   double GetY()
+   {
+      return m_y;
+   }
+
+private:
+   const std::string m_name = "Class1";
+
+   int m_x;
+   double m_y;
+};
+class Class2
+{
+public:
+   Class2(std::string type) : m_type(type)
+   {};
+
+   std::string GetClassName()
+   {
+      return m_name;
+   }
+   std::string GetType()
+   {
+      return m_type;
+   }
+
+private:
+   const std::string m_name = "Class2";
+
+   std::string m_type;
+};
+
+void TemplateFactoryTest()
+{
+
+   Class1* cl1 = Factory<Class1, int, double>::Create(5, 2.6);
+   Class2* cl2 = Factory<Class2, std::string>::Create("type");
+   cout << cl1->GetClassName().c_str() << '\t' << cl1->GetX() << '\t' << cl1->GetY() << endl;
+   cout << cl2->GetClassName().c_str() << '\t' << cl2->GetType().c_str() << endl;
+
+   Class1* cl11 = FactoryFun<Class1, int, double>(50, 12.6);
+   Class2* cl21 = FactoryFun<Class2, std::string>("type");
+   cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << endl;
+   cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << endl;
+
+}
+
 void FactoryMethodTest()
 {
-	TClass_1* obj1 = (TClass_1*)TBaseClass::CreateObject("class_1");
-	TClass_2* obj2 = (TClass_2*)TBaseClass::CreateObject("class_2");
+	TClass_1* obj1 = static_cast<TClass_1*>(TBaseClass::CreateObject("class_1"));
+	TClass_2* obj2 = static_cast<TClass_2*>(TBaseClass::CreateObject("class_2"));
 	
 	TBaseClass* obj3 = TBaseClass::CreateObject("11");
 
@@ -20,8 +81,10 @@ void FactoryMethodTest()
 	
 	for (size_t n = 0, size = obj2->GetSize(); n < size; n++)
 		cout << obj2->GetData(n) << endl;
-	
-	_getch();
+
+   TemplateFactoryTest();
+
+   _getch();
 
 	obj2->Free();
 

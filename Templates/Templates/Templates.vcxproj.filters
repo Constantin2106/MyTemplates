@@ -22,6 +22,27 @@
     <Filter Include="src\Singleton">
       <UniqueIdentifier>{dae3643c-85fd-47c6-aae1-2ab92df577c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Thread">
+      <UniqueIdentifier>{8e01d9f8-ee1d-45e6-a11c-6fea077943d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PImp">
+      <UniqueIdentifier>{a0669de5-d6fb-4e36-8bf2-5f11f7692323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Strategy">
+      <UniqueIdentifier>{303a1780-b66a-4716-b480-0a7fd5030126}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Callback">
+      <UniqueIdentifier>{40fe4a62-df82-44a6-94e9-c935f90b1aa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Visitor">
+      <UniqueIdentifier>{8b0d9fde-0617-46e4-bbd0-8d2dbbcda7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Delegate">
+      <UniqueIdentifier>{c60ceddc-f8a6-4363-adce-2053989e5227}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Decorator">
+      <UniqueIdentifier>{d2cd5a73-da85-443a-8bdf-5e28d13ee35b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -45,6 +66,57 @@
     <ClInclude Include="src\Singleton\SingletonTest.h">
       <Filter>src\Singleton</Filter>
     </ClInclude>
+    <ClInclude Include="src\Thread\ThreadTest.h">
+      <Filter>src\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Thread\Thread.h">
+      <Filter>src\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PImp\PImp.h">
+      <Filter>src\PImp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PImp\PImplTest.h">
+      <Filter>src\PImp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Strategy\Strategy.h">
+      <Filter>src\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Strategy\StrategyTest.h">
+      <Filter>src\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lambda\CallbackTest.h">
+      <Filter>src\Callback</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Callback\Callback.h">
+      <Filter>src\Callback</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Visitor\FileService.h">
+      <Filter>src\Visitor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Visitor\File.h">
+      <Filter>src\Visitor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Visitor\VisitorTest.h">
+      <Filter>src\Visitor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Delegate\Delegate.h">
+      <Filter>src\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Delegate\DelegateTest.h">
+      <Filter>src\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Delegate\MyDelegate.h">
+      <Filter>src\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Delegate\MyDelegateTest.h">
+      <Filter>src\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Decorator\Decorator.h">
+      <Filter>src\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Decorator\DecoratorTest.h">
+      <Filter>src\Decorator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Factory Method\FactoryMethodTest.cpp">
@@ -61,6 +133,48 @@
     </ClCompile>
     <ClCompile Include="Templates.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Thread\ThreadTest.cpp">
+      <Filter>src\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Thread\Thread.cpp">
+      <Filter>src\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PImp\PImp.cpp">
+      <Filter>src\PImp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PImp\PImplTest.cpp">
+      <Filter>src\PImp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Strategy\Strategy.cpp">
+      <Filter>src\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Strategy\StrategyTest.cpp">
+      <Filter>src\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Callback\CallbackTest.cpp">
+      <Filter>src\Callback</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Visitor\FileService.cpp">
+      <Filter>src\Visitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Visitor\File.cpp">
+      <Filter>src\Visitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Visitor\VisitorTest.cpp">
+      <Filter>src\Visitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Delegate\DelegateTest.cpp">
+      <Filter>src\Delegate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Delegate\MyDelegateTest.cpp">
+      <Filter>src\Delegate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Decorator\Decorator.cpp">
+      <Filter>src\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Decorator\DecoratorTest.cpp">
+      <Filter>src\Decorator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

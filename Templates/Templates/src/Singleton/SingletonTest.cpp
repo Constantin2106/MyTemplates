@@ -21,7 +21,8 @@ void SingletonTest()
 
 	singleton->Free();
 
+	TSingleton::Destroy(singleton);
+
 	_getch();
-	delete singleton;
 
 }

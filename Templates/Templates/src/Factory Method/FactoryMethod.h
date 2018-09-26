@@ -2,6 +2,24 @@
 #define FACTORY_METHOD
 
 #include <unordered_map>
+#include <memory>
+
+//---------------------------------------------------------------------------//
+template<typename T, typename... Arg>
+T* FactoryFun(Arg... args)
+{
+   return new T(forward<Arg>(args)...);
+}
+
+template<typename T, typename... Arg>
+class Factory
+{
+public:
+   static T* Create(Arg... args)
+   {
+      return new T(forward<Arg>(args)...);
+   }
+};
 
 //---------------------------------------------------------------------------//
 class TBaseClass

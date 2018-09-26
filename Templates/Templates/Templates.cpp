@@ -11,8 +11,17 @@
 
 #include "src/Factory Method/FactoryMethodTest.h"
 #include "src/Singleton/SingletonTest.h"
+#include "src/Thread/ThreadTest.h"
+#include "src/PImp/PImplTest.h"
+#include "src/Strategy/StrategyTest.h"
+#include "src/Callback/CallbackTest.h"
+#include "src/Visitor/VisitorTest.h"
+#include "src/Delegate/DelegateTest.h"
+#include "src/Delegate/MyDelegateTest.h"
+#include "src/Decorator/DecoratorTest.h"
 
 #include <vld.h>
+
 
 using namespace std;
 //using json = nlohmann::json;
@@ -21,7 +30,15 @@ using namespace std;
 int main()
 {
 	FactoryMethodTest();
-	SingletonTest();
+	//SingletonTest();
+	//ThreadTest();
+    //PImplTest();
+    //StrategyTest();
+    //LambdaTest();
+    //VisitorTest();
+	//DelegateTest();
+   //MyDelegateTest();
+   //DecoratorTest();
 
 	/*
 	json Json;
