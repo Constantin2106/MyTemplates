@@ -14,3 +14,7 @@ Templates/ipch/TEMPLATES-e5058238/TEMPLATES-92d664d9.ipch
 Templates/x64/Debug/Templates.exe
 Templates/x64/Debug/Templates.ilk
 Templates/x64/Debug/Templates.pdb
+*.suo
+*.VC.db
+*.VC.opendb
+Templates/.vs/
