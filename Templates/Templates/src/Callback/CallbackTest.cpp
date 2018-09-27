@@ -34,7 +34,7 @@ void ProcessElementLambda(unsigned idx, LambdaRef<double(int&)> lambda)
 
 void LambdaTest()
 {
-    FuncRef<int(int&)> add = &Add;
+    FuncRef<decltype(Add)> add = &Add;
     const FuncRef<double(int&)> mul = &Mul;
 
     for(unsigned i = 0; i < 5; i++)
