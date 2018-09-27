@@ -4,21 +4,21 @@
 
 using namespace std;
 
-unsigned TThread::maxThreads = 0;
-unsigned TThread::maxId = 0;
+unsigned TThread::m_maxThreads = 0;
+unsigned TThread::m_maxId = 0;
 
 TThread::TThread() :
-terminate(false)
+m_terminate(false)
 {
-	id = ++maxId;
+	m_id = ++m_maxId;
 
 	unsigned supportingTreads = thread::hardware_concurrency();
-	maxThreads = supportingTreads > 1 ? supportingTreads : 1;
+	m_maxThreads = supportingTreads > 1 ? supportingTreads : 1;
 }
 TThread::~TThread()
 {
-	while (!tasks.empty())
-		tasks.pop();
+	while (!m_tasks.empty())
+		m_tasks.pop();
 }
 
 bool TThread::Initialize()
@@ -34,25 +34,21 @@ bool TThread::Free()
 
 void TThread::Run()
 {
-	while (!tasks.empty())
+	while (!m_tasks.empty())
 	{
-		Task task = tasks.front();
-		tasks.pop();
+		Task task = m_tasks.front();
+		m_tasks.pop();
 
-		thread thr(task.function, task.data);
+		thread thr(task.m_func, task.m_data);
 		//if (thr.joinable())
 		//	thr.join();
 		thr.detach();
 	}
 }
 
-unsigned TThread::AddTask(void(*_function)(void*), void* _data)
+unsigned TThread::AddTask(void(*_func)(void*), void* _data)
 {
-	Task task;
-	task.data = _data;
-	task.function = _function;
+   m_tasks.emplace(_func, _data);
 
-	tasks.push(task);
-
-	return (unsigned)tasks.size();
+	return static_cast<unsigned>(m_tasks.size());
 }

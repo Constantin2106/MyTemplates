@@ -29,9 +29,9 @@ using namespace std;
 
 int main()
 {
-	FactoryMethodTest();
+	//FactoryMethodTest();
 	//SingletonTest();
-	//ThreadTest();
+	ThreadTest();
     //PImplTest();
     //StrategyTest();
     //LambdaTest();

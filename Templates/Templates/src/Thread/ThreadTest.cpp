@@ -15,13 +15,14 @@ void fun2(void* _data)
 {
 	long unsigned n = 0;
 	char buff[100];
-	while (n <= 1e+5)
+   cout << endl;
+   while (n <= 1e+5)
 	{ 
 		_itoa_s(n, buff, 100, 10);
 		cout << buff << '\r';
 		n++;
 	}
-	cout;
+
 	strcpy_s((char*)_data, sizeof(_data), buff);
 }
 

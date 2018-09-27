@@ -20,9 +20,9 @@ private:
 	const std::string className = "Singleton";
 
 	int size;
-	int* data;
+	int* m_data;
 
-	TSingleton() : data(nullptr), size(0) {}
+	TSingleton() : m_data(nullptr), size(0) {}
 	TSingleton(const TSingleton&) = delete;
 	TSingleton& operator = (const TSingleton&) = delete;
 
