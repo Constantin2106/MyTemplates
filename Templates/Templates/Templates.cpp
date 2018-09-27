@@ -31,7 +31,7 @@ int main()
 {
 	//FactoryMethodTest();
 	//SingletonTest();
-	//ThreadTest();
+	ThreadTest();
     //PImplTest();
     //StrategyTest();
     LambdaTest();

@@ -31,7 +31,7 @@ bool TSingleton::Destroy(TSingleton* singleton)
 bool TSingleton::Initialize()
 {
 	size = 10;
-	data = new int[size];
+	m_data = new int[size];
 
 	return true;
 }
@@ -40,7 +40,7 @@ bool TSingleton::Free()
 {
 	if(size > 0)
 	{
-		delete[] data;
+		delete[] m_data;
 		size = 0;
 
 		return true;

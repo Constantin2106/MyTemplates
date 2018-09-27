@@ -4,30 +4,25 @@
 #include <iostream>
 #include <conio.h>
 #include <mutex>
-#include <string>
-
-#include <Windows.h>
 
 using namespace std;
 
 void fun1(void* _data)
 {
 	*(int*)_data = 55;
-   //Sleep(1000);
 }
 void fun2(void* _data)
 {
 	long unsigned n = 0;
 	char buff[100];
-   
    cout << endl;
-	while (n <= 1e+5)
+   while (n <= 1e+5)
 	{ 
 		_itoa_s(n, buff, 100, 10);
-		cout << n << '\r';
+		cout << buff << '\r';
 		n++;
 	}
-	//cout;
+
 	strcpy_s((char*)_data, sizeof(_data), buff);
 }
 
@@ -49,8 +44,9 @@ void ThreadTest()
 	thread1->Run();
 	thread2->Run();
 	
-   string buff = to_string(*data1);
-	cout << buff.c_str() << endl;
+   char buff[5] = { 0 };
+	_itoa_s(*data1, buff, 5, 10);
+	cout << buff << endl;
 	
 	//thread2->Run();
 	//cout << data2 << endl;
