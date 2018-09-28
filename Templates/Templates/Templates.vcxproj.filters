@@ -43,6 +43,9 @@
     <Filter Include="src\Decorator">
       <UniqueIdentifier>{d2cd5a73-da85-443a-8bdf-5e28d13ee35b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\TaskPool">
+      <UniqueIdentifier>{5ad78677-1540-41f3-b36e-cf7c0c4c8537}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -117,6 +120,12 @@
     <ClInclude Include="src\Decorator\DecoratorTest.h">
       <Filter>src\Decorator</Filter>
     </ClInclude>
+    <ClInclude Include="src\TaskPool\TaskPoolTest.h">
+      <Filter>src\TaskPool</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TaskPool\TaskPool.h">
+      <Filter>src\TaskPool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Factory Method\FactoryMethodTest.cpp">
@@ -175,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="src\Decorator\DecoratorTest.cpp">
       <Filter>src\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TaskPool\TaskPoolTest.cpp">
+      <Filter>src\TaskPool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

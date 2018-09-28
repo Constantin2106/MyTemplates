@@ -19,6 +19,7 @@
 #include "src/Delegate/DelegateTest.h"
 #include "src/Delegate/MyDelegateTest.h"
 #include "src/Decorator/DecoratorTest.h"
+#include "src/TaskPool/TaskPoolTest.h"
 
 #include <vld.h>
 
@@ -31,10 +32,11 @@ int main()
 {
 	//FactoryMethodTest();
 	//SingletonTest();
-	ThreadTest();
+	//ThreadTest();
+   TaskPoolTest();
     //PImplTest();
     //StrategyTest();
-    LambdaTest();
+    //LambdaTest();
     //VisitorTest();
 	//DelegateTest();
    //MyDelegateTest();

@@ -165,6 +165,8 @@
     <ClInclude Include="src\Singleton\SingletonTest.h" />
     <ClInclude Include="src\Strategy\Strategy.h" />
     <ClInclude Include="src\Strategy\StrategyTest.h" />
+    <ClInclude Include="src\TaskPool\TaskPoolTest.h" />
+    <ClInclude Include="src\TaskPool\TaskPool.h" />
     <ClInclude Include="src\Thread\Thread.h" />
     <ClInclude Include="src\Thread\ThreadTest.h" />
     <ClInclude Include="src\Visitor\File.h" />
@@ -183,6 +185,7 @@
     <ClCompile Include="src\PImp\PImplTest.cpp" />
     <ClCompile Include="src\Strategy\Strategy.cpp" />
     <ClCompile Include="src\Strategy\StrategyTest.cpp" />
+    <ClCompile Include="src\TaskPool\TaskPoolTest.cpp" />
     <ClCompile Include="src\Thread\Thread.cpp" />
     <ClCompile Include="src\Thread\ThreadTest.cpp" />
     <ClCompile Include="src\Visitor\File.cpp" />
