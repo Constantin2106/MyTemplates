@@ -15,9 +15,11 @@ class TaskPool
 {
 public:
 
-   TaskPool(size_t _threads)
+   TaskPool(size_t _threads) : m_threadNum(_threads) {}
+
+   void Activate()
    {
-      for (size_t i = 0; i < _threads; ++i)
+      for (size_t i = 0; i < m_threadNum; ++i)
       {
          m_threads.emplace_back([this]
          {
@@ -97,7 +99,7 @@ public:
          tread.join();
    }
 private:
-	
+   unsigned m_threadNum;                         // Threads number
 	std::vector<std::thread> m_threads;				// The worker threads
 	std::queue<std::function<void()>> m_tasks;	// The task queue
 

@@ -34,8 +34,11 @@ int slowFun(int i)
 
 void TaskPoolTest()
 {
-   TaskPool pool(8);
    std::vector<std::future<int>> results;
+
+   TaskPool pool(8);
+
+   pool.Activate();
 
    for (int i = 0; i < 8; ++i)
    {
@@ -49,9 +52,9 @@ void TaskPoolTest()
       results.push_back(std::move(fut));*/
    }
 
-   for (auto && result : results)
+   /*for (auto && result : results)
       std::cout << result.get() << ' ';
-   std::cout << std::endl;
+   std::cout << std::endl;*/
 
    _getch();
 }
