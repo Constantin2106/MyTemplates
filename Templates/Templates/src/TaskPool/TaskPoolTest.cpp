@@ -19,13 +19,14 @@ int fastFun(int i)
 
 int slowFun(int i)
 {
-   int N = 10 * i;
+   int N = 5 * i;
 
    for (int n = 0; n < N; ++n)
    {
-      mut.lock();
-      std::cout << n << std::endl;
-      mut.unlock();
+      //mut.lock();
+      std::cout << "slow task step " << n << std::endl;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      //mut.unlock();
    }
 
    return i;

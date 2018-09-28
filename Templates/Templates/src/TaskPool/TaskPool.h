@@ -15,24 +15,24 @@ class TaskPool
 {
 public:
 
-   TaskPool(size_t _threads) : m_threadNum(_threads) {}
+   TaskPool(unsigned _threads) : m_threadNum(_threads) {}
 
    void Activate()
    {
-      for (size_t i = 0; i < m_threadNum; ++i)
+      // Create m_threadNum threads
+      for (unsigned i = 0; i < m_threadNum; ++i)
       {
-         m_threads.emplace_back([this]
+         // Put thread into container
+         m_threads.emplace_back(
+         [this] // thread function
          {
-            for (;;)
+            while(!m_stop)
             {
                std::function<void()> task;
 
                {
                   std::unique_lock<std::mutex> lock(m_queue_mutex);
                   m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
-
-                  if (m_stop)
-                     return;
 
                   if (m_tasks.empty())
                      continue;
@@ -62,9 +62,9 @@ public:
 	 */
 
    template<class F, class... Args> 
-   auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+   auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of_t<F(Args...)>>
    {
-      using return_type = typename std::result_of<F(Args...)>::type;
+      using return_type = typename std::result_of_t<F(Args...)>;
 
       auto task = std::make_shared<std::packaged_task<return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
       std::future<return_type> res = task->get_future();
@@ -98,14 +98,15 @@ public:
       for (auto& tread : m_threads)
          tread.join();
    }
-private:
-   unsigned m_threadNum;                         // Threads number
-	std::vector<std::thread> m_threads;				// The worker threads
-	std::queue<std::function<void()>> m_tasks;	// The task queue
 
-	std::mutex m_queue_mutex;						   // The queue mutex
-	std::condition_variable m_condition;			// The condition based on a lock of queue mutex
-	
+private:
+   unsigned m_threadNum;                        // The number of threads
+   std::vector<std::thread> m_threads;				// The worker threads
+   std::queue<std::function<void()>> m_tasks;	// The task queue
+
+   std::mutex m_queue_mutex;						   // The queue mutex
+   std::condition_variable m_condition;			// The condition based on a lock of queue mutex
+
    std::atomic_bool m_stop;							// false initially, true to stop
 };
 
