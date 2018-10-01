@@ -14,48 +14,55 @@
 class TaskPool
 {
 public:
-
-   TaskPool(unsigned _threads);
+   /**
+    * @fn	TaskPool::TaskPool();
+    *
+    * @brief	Delegating constructor.
+    * 			
+   */
+   TaskPool();
    
    /**
     * @fn	TaskPool::~TaskPool();
     *
-    * @brief	Destructor. Notifies all threads of stop condition so that they do not take other tasks from the pool.
-    * 			Waits for all threads to finish (joins all threads).
-    */
+    * @brief	Destructor. Sets the stop variable and wake up all threads to be finished them.
+    * 			Waits while the all threads will be finished.
+   */
    ~TaskPool();
-
-   void Activate();
  
 	/**
-	 * @fn	template<class F, class... Args> auto TaskPool::enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
+	 * @fn	   TaskPool::AddTask(func, args)
 	 *
-	 * @brief	Queues a task be executed by one of the threads in the pool.
+	 * @brief	The template function for adding a task to the queue.
 	 *
-	 * @tparam	F   	The function type as determined by the template. 
-	 * @tparam	Args  Variable list of arguments as determined by the template.
-	 * @param [in,out] f	The function to process. Takes std::bind, or lambda as r-value or moves all other functional containers.
-	 * @param	args  Variable arguments to pass to the function call.
+	 * @param   f	The function of the task. Takes pointer to function or lambda.
+	 * @param	args  The list of functions arguments.
 	 *
-	 * @return	A future of the result type of the function. A .get() call to this future container returns the result after the task is finished.
-	 * 			The .get() call waits synchronously for the task to finish.
-	 */
+	 * @return	The future object of the result of the task execution.
+	 *          Use 'get' function to retrieve the results when the task will finish. 			
+	*/
    template<class F, class... Args> 
-   auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of_t<F(Args...)>>
+   auto AddTask(F&& f, Args&&... args) -> std::future<typename std::result_of_t<F(Args...)>>
    {
-      using return_type = typename std::result_of_t<F(Args...)>;
+      using ret_type = typename std::result_of_t<F(Args...)>;
 
-      auto task = std::make_shared<std::packaged_task<return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-      std::future<return_type> res = task->get_future();
+      auto task = std::make_shared<std::packaged_task<ret_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+      
+      std::future<ret_type> res = task->get_future();
 
       {
          std::unique_lock<std::mutex> lock(m_queue_mutex);
 
-         //Don't allow enqueueing after stopping the pool
+         // If the pool is stopped, the addition of the task is forbidden.
          if (m_stop)
-            throw std::runtime_error("enqueue on stopped TaskPool");
+            throw std::runtime_error("Pool has been stopped");
 
-         m_tasks.emplace([task]() { (*task)(); });
+         // Add task to queue
+         m_tasks.emplace(
+            [task]()
+            { 
+               (*task)(); 
+            });
       }
 
       m_condition.notify_one();
@@ -63,14 +70,26 @@ public:
    }
 
 private:
-   unsigned m_threadNum;                        // The number of threads
-   std::vector<std::thread> m_threads;				// The worker threads
+   /**
+    * @fn	TaskPool::TaskPool(bool);
+    *
+    * @brief	Constructor.  Defines an optimal number of threads and creates them in a suspended state.
+    * 			
+   */
+   TaskPool(bool _stop);
+
+   TaskPool(const TaskPool&) = delete;
+   TaskPool(TaskPool&&) = delete;
+   TaskPool& operator= (const TaskPool&) = delete;
+   TaskPool&& operator= (TaskPool&&) = delete;
+
+   std::vector<std::thread> m_threads;				// The pool of threads
    std::queue<std::function<void()>> m_tasks;	// The task queue
 
-   std::mutex m_queue_mutex;						   // The queue mutex
-   std::condition_variable m_condition;			// The condition based on a lock of queue mutex
+   std::mutex m_queue_mutex;						   // The mutex is used to lock of tasks queue when the task is added
+   std::condition_variable m_condition;			// The condition variable used to lock of queue mutex
 
-   std::atomic_bool m_stop{ false };				// false initially, true to stop
+   std::atomic_bool m_stop;         				// If true, pool will be stopped
 };
 
 

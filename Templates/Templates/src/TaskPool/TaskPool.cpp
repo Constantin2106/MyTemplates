@@ -1,6 +1,8 @@
+#include <Windows.h>
+
 #include "TaskPool.h"
 
-TaskPool::TaskPool(unsigned _threads) : m_threadNum(_threads) 
+TaskPool::TaskPool() : TaskPool(false)
 {
 }
 
@@ -13,32 +15,38 @@ TaskPool::~TaskPool()
       tread.join();
 }
 
-void TaskPool::Activate()
+TaskPool::TaskPool(bool _stop) : m_stop(_stop)
 {
-   // Create m_threadNum threads
-   for (unsigned i = 0; i < m_threadNum; ++i)
+   // Calc the optimal number of threads
+   SYSTEM_INFO sysInfo;
+   GetSystemInfo(&sysInfo);
+   unsigned threadNum = 2 * sysInfo.dwNumberOfProcessors;
+
+   // Create threads
+   for (unsigned i = 0; i < threadNum; ++i)
    {
-      // Put thread into container
+      // Create thread and put it into container
       m_threads.emplace_back(
          [this] // thread function
-      {
-         while (!m_stop)
          {
-            std::function<void()> task;
-
+            while (!m_stop)
             {
-               std::unique_lock<std::mutex> lock(m_queue_mutex);
-               m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
+               std::function<void()> task;
 
-               if (m_tasks.empty())
-                  continue;
+               {
+                  std::unique_lock<std::mutex> lock(m_queue_mutex);
+                  // Suspend this thread
+                  m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
 
-               task = std::move(m_tasks.front());
-               m_tasks.pop();
+                  if (m_tasks.empty())
+                     continue;
+
+                  task = std::move(m_tasks.front());
+                  m_tasks.pop();
+               }
+
+               task();
             }
-
-            task();
-         }
-      });
+         });
    }
 }

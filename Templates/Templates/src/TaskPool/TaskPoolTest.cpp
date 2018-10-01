@@ -37,20 +37,17 @@ void TaskPoolTest()
 {
    std::vector<std::future<int>> results;
 
-   TaskPool pool(8);
-
-   pool.Activate();
+   TaskPool pool;
+   std::future<int> fut;
 
    for (int i = 0; i < 8; ++i)
    {
-
-      if (i == 1)
-         results.push_back( pool.enqueue(slowFun, i) );
+      if (1 == i)
+         fut = pool.AddTask(slowFun, i);
       else
-         results.push_back( pool.enqueue(fastFun, i) );
+         fut = pool.AddTask(fastFun, i);
 
-      /*auto fut = pool.enqueue(fastFun, i);
-      results.push_back(std::move(fut));*/
+      results.push_back(std::move(fut));
    }
 
    /*for (auto && result : results)
