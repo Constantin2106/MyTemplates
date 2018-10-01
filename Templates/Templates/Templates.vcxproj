@@ -75,8 +75,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)Intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)Bin\$(Configuration)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(Configuration)$(Platform)\</IntDir>
+    <ExtensionsToDeleteOnClean>*.cdf;*.cache;*.obj;*.obj.enc;*.ilk;*.ipdb;*.iobj;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.log;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -185,6 +186,7 @@
     <ClCompile Include="src\PImp\PImplTest.cpp" />
     <ClCompile Include="src\Strategy\Strategy.cpp" />
     <ClCompile Include="src\Strategy\StrategyTest.cpp" />
+    <ClCompile Include="src\TaskPool\TaskPool.cpp" />
     <ClCompile Include="src\TaskPool\TaskPoolTest.cpp" />
     <ClCompile Include="src\Thread\Thread.cpp" />
     <ClCompile Include="src\Thread\ThreadTest.cpp" />

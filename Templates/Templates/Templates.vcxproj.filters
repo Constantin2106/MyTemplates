@@ -188,5 +188,8 @@
     <ClCompile Include="src\TaskPool\TaskPoolTest.cpp">
       <Filter>src\TaskPool</Filter>
     </ClCompile>
+    <ClCompile Include="src\TaskPool\TaskPool.cpp">
+      <Filter>src\TaskPool</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
