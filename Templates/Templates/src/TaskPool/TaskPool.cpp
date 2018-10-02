@@ -1,5 +1,3 @@
-#include <Windows.h>
-
 #include "TaskPool.h"
 
 TaskPool::TaskPool() : TaskPool(false)
@@ -8,41 +6,54 @@ TaskPool::TaskPool() : TaskPool(false)
 
 TaskPool::~TaskPool()
 {
-   m_stop = true;
+   m_finish = true;
 
-   m_condition.notify_all();
-   for (auto& tread : m_threads)
-      tread.join();
+   m_thread_control.notify_all();
+   for (auto& thread : m_threads)
+   {
+      if (thread.joinable())
+      {
+         thread.join();
+      }
+      else
+      {
+         // ???
+      }
+   }
 }
 
-TaskPool::TaskPool(bool _stop) : m_stop(_stop)
+TaskPool::TaskPool(bool _finish) : m_finish(_finish)
 {
    // Calc the optimal number of threads
    SYSTEM_INFO sysInfo;
    GetSystemInfo(&sysInfo);
-   unsigned threadNum = 2 * sysInfo.dwNumberOfProcessors;
+   UINT threadNum = /*2 * */sysInfo.dwNumberOfProcessors;
 
    // Create threads
-   for (unsigned i = 0; i < threadNum; ++i)
+   for (UINT i = 0; i < threadNum; ++i)
    {
       // Create thread and put it into container
       m_threads.emplace_back(
-         [this] // thread function
+         [&] // thread function
          {
-            while (!m_stop)
+            while (!m_finish)
             {
-               std::function<void()> task;
+               taskFun task;
 
                {
-                  std::unique_lock<std::mutex> lock(m_queue_mutex);
+                  std::unique_lock<std::mutex> lock(m_map_mutex);
                   // Suspend this thread
-                  m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
+                  m_thread_control.wait(lock, [&]
+                  { 
+                     return m_finish || !m_tasks.empty(); 
+                  });
 
                   if (m_tasks.empty())
                      continue;
 
-                  task = std::move(m_tasks.front());
-                  m_tasks.pop();
+                  auto it = m_tasks.cbegin();
+                  task = std::move(it->second);
+                  m_tasks.erase(it);
                }
 
                task();
