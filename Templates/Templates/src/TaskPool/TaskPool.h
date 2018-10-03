@@ -50,7 +50,6 @@ public:
 
       auto task = std::make_shared<std::packaged_task<ret_type()>>
          (std::bind(std::forward<F>(func), std::forward<Args>(args)...));
-      //auto task = std::packaged_task<ret_type()>(std::bind(std::forward<F>(func), std::forward<Args>(args)...));
 
       std::future<ret_type> fut = task->get_future();
 
@@ -61,12 +60,8 @@ public:
          if (m_finish)
             throw std::runtime_error("Pool has been stopped");
 
-         // Add task to queue
-         m_tasks.emplace(_priority,
-            [task]()
-         {
-            (*task)();
-         });
+         // Add task with priority
+         m_tasks.emplace(_priority, [task]() { (*task)(); });
       }
 
       m_thread_control.notify_one();
@@ -82,8 +77,10 @@ public:
    */
    std::size_t Size() { return m_threads.size(); }
 
+   void Destroy() { finish(); }
+
 private:
-   using taskFun = std::function<void()>;
+   using taskFunc = std::function<void()>;
 
    /**
     * @fn	TaskPool::TaskPool(bool);
@@ -98,8 +95,10 @@ private:
    TaskPool& operator= (const TaskPool&) = delete;
    TaskPool&& operator= (TaskPool&&) = delete;
 
+   void finish();
+
    std::vector<std::thread> m_threads;       // The container of threads   
-   std::multimap<UINT, taskFun,              // The <priority, function> multimap
+   std::multimap<UINT, taskFunc,             // The <priority, function> multimap
       std::greater<UINT>> m_tasks;	         // More priority tasks always are on the top of the map
 
    std::mutex m_map_mutex;						   // The mutex is used to lock of tasks map when the task is added

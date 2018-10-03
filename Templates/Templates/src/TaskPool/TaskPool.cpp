@@ -6,20 +6,7 @@ TaskPool::TaskPool() : TaskPool(false)
 
 TaskPool::~TaskPool()
 {
-   m_finish = true;
-
-   m_thread_control.notify_all();
-   for (auto& thread : m_threads)
-   {
-      if (thread.joinable())
-      {
-         thread.join();
-      }
-      else
-      {
-         // ???
-      }
-   }
+   finish();
 }
 
 TaskPool::TaskPool(bool _finish) : m_finish(_finish)
@@ -38,7 +25,7 @@ TaskPool::TaskPool(bool _finish) : m_finish(_finish)
          {
             while (!m_finish)
             {
-               taskFun task;
+               taskFunc task;
 
                {
                   std::unique_lock<std::mutex> lock(m_map_mutex);
@@ -59,5 +46,23 @@ TaskPool::TaskPool(bool _finish) : m_finish(_finish)
                task();
             }
          });
+   }
+}
+
+void TaskPool::finish()
+{
+   m_finish = true;
+
+   m_thread_control.notify_all();
+   for (auto& thread : m_threads)
+   {
+      if (thread.joinable())
+      {
+         thread.join();
+      }
+      else
+      {
+         // ???
+      }
    }
 }
