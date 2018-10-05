@@ -51,15 +51,16 @@ public:
       auto task = std::make_shared<std::packaged_task<ret_type()>>
          (std::bind(std::forward<F>(func), std::forward<Args>(args)...));
 
-      std::future<ret_type> fut = task->get_future();
+      std::future<ret_type> fut{};
 
       {
          std::unique_lock<std::mutex> lock(m_map_mutex);
 
          // If the pool is stopped, the addition of the task is forbidden.
          if (m_finish)
-            throw std::runtime_error("Pool has been stopped");
+             return fut;
 
+         fut = task->get_future();
          // Add task with priority
          m_tasks.emplace(_priority, [task]() { (*task)(); });
       }
@@ -75,8 +76,22 @@ public:
     * @brief	Return the pool size
     *
    */
-   std::size_t Size() { return m_threads.size(); }
+   std::size_t Size();
 
+   /**
+    * @fn	   TaskPool::TaskNumber();
+    *
+    * @brief	Return the tasks number
+    *
+   */
+   std::size_t TaskNumber();
+
+   /**
+    * @fn	   TaskPool::Destroy();
+    *
+    * @brief	Destroys this pool
+    *
+   */
    void Destroy() { finish(); }
 
 private:
@@ -95,6 +110,14 @@ private:
    TaskPool& operator= (const TaskPool&) = delete;
    TaskPool&& operator= (TaskPool&&) = delete;
 
+   /**
+    * @fn	TaskPool::finish();
+    *
+    * @brief	Sets the m_finish variable. 
+    *          Clears the threads map.
+    *          Wake up all threads to be finished them.
+    * 			Waits while the all threads will be finished.
+   */
    void finish();
 
    std::vector<std::thread> m_threads;       // The container of threads   

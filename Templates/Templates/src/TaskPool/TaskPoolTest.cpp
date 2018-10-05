@@ -27,12 +27,17 @@ int slowFun(int i)
       mut.lock();
       std::cout << "slow task step " << n << std::endl;
       mut.unlock();
-      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
    }
 
    return i;
 }
 
+#define  Message(msg)      \
+   mut.lock();             \
+   msg                     \
+   mut.unlock();
+   
 void TaskPoolTest()
 {
    std::vector<std::future<int>> results;
@@ -40,35 +45,37 @@ void TaskPoolTest()
    TaskPool pool;
    std::future<int> fut;
 
-   mut.lock();
-   std::cout << "------ Pool size " << pool.Size() << " ------" << std::endl;
-   mut.unlock();
+   Message(std::cout << "------ Pool size " << pool.Size() << " ------" << std::endl;)
 
-   int fFunNum = pool.Size() * 2;
+   int fastTasksNum = pool.Size() * 3;
 
-   for (int k = 0; k < fFunNum; ++k)
+   for (int k = 0; k < fastTasksNum; ++k)
    {
       fut = pool.AddTask(0, fastFun, k);
       results.push_back(std::move(fut));
    }
-   mut.lock();
-   std::cout << "------ Added " << fFunNum << " fast tasks ------" << std::endl;
-   mut.unlock();
+   Message(std::cout << "------ Added " << fastTasksNum << " fast tasks ------" << std::endl;)
 
-   fut = pool.AddTask(1, slowFun, fFunNum);
+
+   fut = pool.AddTask(1, slowFun, fastTasksNum);
    results.push_back(std::move(fut));
-   mut.lock();
-   std::cout << "------ Added " << "1" << " slow task ------" << std::endl;
-   mut.unlock();
+   Message(std::cout << "------ Added " << "1" << " slow task ------" << std::endl;)
 
-   for (int k = fFunNum, n = fFunNum + 5; k < n; ++k)
+
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+   Message(std::cout << "------ Before destroying. Task number " << pool.TaskNumber() << std::endl;)
+   pool.Destroy();
+   Message(std::cout << "------ After destroying. Task number " << pool.TaskNumber() << std::endl;
+   std::cout << "------ The pool has been destroyed ------" << std::endl;)
+
+   for (int k = fastTasksNum, n = fastTasksNum + 5; k < n; ++k)
    {
       fut = pool.AddTask(0, fastFun, k);
       results.push_back(std::move(fut));
    }
-   mut.lock();
-   std::cout << "------ Added else " << "5" << " fast task ------" << std::endl;
-   mut.unlock();
+   Message(std::cout << "------ Added else " << "5" << " fast task ------" << std::endl;)
+
 
    //int sFuncInd = 10;
    //for (int i = 0; i < 12; ++i)
