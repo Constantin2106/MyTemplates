@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MyVisitor.cpp" />
+    <ClCompile Include="src\File.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileService.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{2d8d52dc-d948-48e9-bc9b-641df48fa2b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\File.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileService.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
