@@ -11,6 +11,13 @@
 
 std::mutex mut;
 
+#define  Message(msg)               \
+{                                   \
+    std::unique_lock<std::mutex>    \
+        lock(mut);                  \
+    msg                             \
+}
+
 int fastFun(int i)
 {
     mut.lock();
@@ -36,10 +43,6 @@ int slowFun(int i)
     return i;
 }
 
-#define  Message(msg)      \
-   mut.lock();             \
-   msg                     \
-   mut.unlock();
 
 int main()
 {
