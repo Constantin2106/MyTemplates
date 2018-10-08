@@ -20,9 +20,7 @@ std::mutex mut;
 
 int fastFun(int i)
 {
-    mut.lock();
-    std::cout << "fast task " << i << std::endl;
-    mut.unlock();
+    Message(std::cout << "fast task " << i << std::endl;)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     return i;
@@ -34,9 +32,7 @@ int slowFun(int i)
 
     for(int n = 0; n < N; ++n)
     {
-        mut.lock();
-        std::cout << "slow task step " << n << std::endl;
-        mut.unlock();
+        Message(std::cout << "slow task step " << n << std::endl;)
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
@@ -53,7 +49,7 @@ int main()
 
     Message(std::cout << "------ Pool size " << pool.Size() << " ------" << std::endl;)
 
-    int fastTasksNum = pool.Size() * 3;
+    int fastTasksNum = pool.Size() * 2;
 
     for(int k = 0; k < fastTasksNum; ++k)
     {
