@@ -8,4 +8,9 @@
       <UniqueIdentifier>{d3f44f61-01a7-45d8-a0cf-f9bdfaadc7a6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\FunctionRef.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
