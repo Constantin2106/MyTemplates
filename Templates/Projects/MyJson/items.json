@@ -1,0 +1,163 @@
+[
+  {
+    "group": "WALLS",
+    "id": "1",
+    "isResource": false,
+    "name": "Gypsum",
+    "properties": [
+      {
+        "name": "length",
+        "value": "2.8"
+      },
+      {
+        "name": "width",
+        "value": "0.08"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "WALLS",
+    "id": "2",
+    "isResource": false,
+    "name": "Wooden",
+    "properties": [
+      {
+        "name": "length",
+        "value": "4"
+      },
+      {
+        "name": "width",
+        "value": "1"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl2"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "WALLS",
+    "id": "3",
+    "isResource": false,
+    "name": "Glass",
+    "properties": [
+      {
+        "name": "length",
+        "value": "2"
+      },
+      {
+        "name": "width",
+        "value": "0.05"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl3"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "DOOR",
+    "id": "4",
+    "isResource": false,
+    "name": "FirstType",
+    "properties": [
+      {
+        "name": "length",
+        "value": "0.5"
+      },
+      {
+        "name": "width",
+        "value": "0.2"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl4"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "DOOR",
+    "id": "5",
+    "isResource": false,
+    "name": "SecondType",
+    "properties": [
+      {
+        "name": "length",
+        "value": "0.5"
+      },
+      {
+        "name": "width",
+        "value": "0.2"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "WINDOW",
+    "id": "6",
+    "isResource": false,
+    "name": "Single",
+    "properties": [
+      {
+        "name": "length",
+        "value": "0.5"
+      },
+      {
+        "name": "width",
+        "value": "0.1"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl"
+      }
+    ],
+    "type": "ITEM"
+  },
+  {
+    "group": "WINDOW",
+    "id": "7",
+    "isResource": false,
+    "name": "Double",
+    "properties": [
+      {
+        "name": "length",
+        "value": "0.5"
+      },
+      {
+        "name": "width",
+        "value": "0.2"
+      }
+    ],
+    "resources": [
+      {
+        "name": "image",
+        "value": "someurl"
+      }
+    ],
+    "type": "ITEM"
+  }
+]
