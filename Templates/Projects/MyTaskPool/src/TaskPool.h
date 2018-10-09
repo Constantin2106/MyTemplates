@@ -16,6 +16,7 @@
 class TaskPool
 {
 public:
+   using taskFunc = std::function<void()>;
    /**
     * @fn	TaskPool::TaskPool();
     *
@@ -95,8 +96,6 @@ public:
    void Destroy() { finish(); }
 
 private:
-   using taskFunc = std::function<void()>;
-
    /**
     * @fn	TaskPool::TaskPool(bool);
     *
