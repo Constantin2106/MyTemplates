@@ -17,33 +17,50 @@ class TaskPool
 {
 public:
    using taskFunc = std::function<void()>;
-   /**
-    * @fn	TaskPool::TaskPool();
-    *
-    * @brief	Delegating constructor.
-    *
-   */
+/*
+Description
+   Delegating constructor
+
+Arguments
+
+Return
+
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    TaskPool();
 
-   /**
-    * @fn	TaskPool::~TaskPool();
-    *
-    * @brief	Destructor. Sets the stop variable and wake up all threads to be finished them.
-    * 			Waits while the all threads will be finished.
-   */
+/*
+Description
+   Destructor. Destroys the task pool by calling finish function.
+
+Arguments
+
+Return
+
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    ~TaskPool();
 
-   /**
-    * @fn	   TaskPool::AddTask(func, args)
-    *
-    * @brief	The template function for adding a task to the queue.
-    *
-    * @param   func	The function of the task. Takes pointer to function or lambda.
-    * @param	args  The list of functions arguments.
-    *
-    * @return	The future object of the result of the task execution.
-    *          Use 'get' function to retrieve the results when the task will finish.
-   */
+/*
+Description
+   TaskPool::AddTask(pri, func, args);
+   Add new task to the task queue. 
+   The added task puts into the task queue according to its priority.
+
+Arguments
+   pri   The prioruty of this task.
+   func  The function of the task. Takes pointer to function or lambda.
+   args  The list of functions arguments.
+
+Return
+   The future object of the result of the task execution.
+   Use 'get' function to retrieve the results when the task will finish.
+
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    template<class F, class... Args>
    auto AddTask(UINT _priority, F&& func, Args&&... args)
    {
@@ -71,36 +88,63 @@ public:
       return fut;
    }
 
-   /**
-    * @fn	   TaskPool::Size();
-    *
-    * @brief	Return the pool size
-    *
-   */
+/*
+   Description
+      TaskPool::Size();
+
+   Arguments
+
+   Return
+      Return number of thread in the pool
+
+   History
+      Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    std::size_t Size();
 
-   /**
-    * @fn	   TaskPool::TaskNumber();
-    *
-    * @brief	Return the tasks number
-    *
-   */
+/*
+   Description
+      TaskPool::TaskNumber();
+
+   Arguments
+
+   Return
+      Return number of tasks in the pool queue
+
+   History
+      Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    std::size_t TaskNumber();
 
-   /**
-    * @fn	   TaskPool::Destroy();
-    *
-    * @brief	Destroys this pool
-    *
-   */
+/*
+   Description
+      TaskPool::Destroy(); Immediately destroys the task pool by calling finish function.
+
+   Arguments
+
+   Return
+
+   History
+      Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    void Destroy() { finish(); }
 
 private:
-   /**
-    * @fn	TaskPool::TaskPool(bool);
-    *
-    * @brief	Constructor. Defines an optimal number of threads and creates them in a suspended state.
-    *
+   /*
+   Description
+      TaskPool::TaskPool(bool);
+      Constructor. Defines the number of a processors core.
+      Creates threads and suspends them until the next task will be added to the queue.
+      Then the one thread will be waked up
+      and the task with max priority retrieved from the task queue and executed.
+
+   Arguments
+      It needs some kind of argument in order to be called from the delegating constructor.
+
+   Return
+
+   History
+      Created by Created by Kostiantyn Zhelieznov   10/01/2018
    */
    TaskPool(bool _finish);
 
@@ -109,14 +153,19 @@ private:
    TaskPool& operator= (const TaskPool&) = delete;
    TaskPool&& operator= (TaskPool&&) = delete;
 
-   /**
-    * @fn	TaskPool::finish();
-    *
-    * @brief	Sets the m_finish variable. 
-    *          Clears the threads map.
-    *          Wake up all threads to be finished them.
-    * 			Waits while the all threads will be finished.
-   */
+/*
+   Description
+      TaskPool::finish();    
+      Sets the stop variable and wake up all threads to be finished them.
+      Clears the task queue and waits while all executed threads will be finished
+
+   Arguments
+
+   Return
+
+   History
+      Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    void finish();
 
    std::vector<std::thread> m_threads;       // The container of threads   
