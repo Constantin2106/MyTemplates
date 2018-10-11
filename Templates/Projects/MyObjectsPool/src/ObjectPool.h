@@ -6,12 +6,9 @@ template<typename T>
 class ObjectPool
 {
 public:
-   static ObjectPool* Instance()
+   static ObjectPool& Instance()
    {
-      if (nullptr == instance)
-      {
-         instance = new ObjectPool();
-      }
+      static ObjectPool instance;
       return instance;
    }
 
@@ -45,13 +42,12 @@ public:
    }
 
 private:
-   static ObjectPool* instance;
    std::list<T*> m_objects;
 
-   ObjectPool() = default;
-   ObjectPool(const ObjectPool&) = delete;
-   ObjectPool(ObjectPool&&) = delete;
-   const ObjectPool& operator=(const ObjectPool&) = delete;
-   ObjectPool&& operator=(ObjectPool&&) = delete;
+   ObjectPool() {}
+   //ObjectPool(const ObjectPool&) = delete;
+   //ObjectPool(ObjectPool&&) = delete;
+   //ObjectPool& operator=(const ObjectPool&) = delete;
+   //ObjectPool&& operator=(ObjectPool&&) = delete;
 
 };
