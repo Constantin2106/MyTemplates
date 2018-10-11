@@ -8,4 +8,9 @@
       <UniqueIdentifier>{219beb1f-858d-4584-be86-8a38a1875c36}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ObjectPool.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
