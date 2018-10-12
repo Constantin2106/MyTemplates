@@ -9,45 +9,54 @@ public:
    static ObjectPool& Instance()
    {
       static ObjectPool instance;
-      return instance;
+      return instance;// std::move(instance);
    }
 
-   ~ObjectPool()
+   bool Generate(int _num)
    {
-      while(!m_objects.empty())
+      for (int n = 0; n < _num; ++n)
       {
-         delete m_objects.front();
-         m_objects.pop_front();
+         auto obj = std::make_unique<T>();
+         m_objects.push_back(std::move(obj));
       }
+
+      return true;
    }
 
-   T* GetObject()
+   std::unique_ptr<T>&& GetObject()
    {
+      std::unique_ptr<T> obj = {};
+
       if (m_objects.empty())
       {
-         return new T();
+         obj = std::make_unique<T>();
+         
+         return std::move(obj);
       }
       
-      T* obj = m_objects.front();
+      obj = std::move(m_objects.front());
       m_objects.pop_front();
-      return obj;
+      return std::move(obj);
    }
 
-   void ReturnObject(T* obj)
+   void ReturnObject(std::unique_ptr<T>&& obj)
    {
-      if (nullptr == obj)
+      if (nullptr == obj.get())
          return;
 
-      m_objects.push_back(obj);
+      m_objects.push_back(std::move(obj));
    }
 
 private:
-   std::list<T*> m_objects;
+   std::list<std::unique_ptr<T>> m_objects;
 
-   ObjectPool() {}
-   //ObjectPool(const ObjectPool&) = delete;
-   //ObjectPool(ObjectPool&&) = delete;
-   //ObjectPool& operator=(const ObjectPool&) = delete;
-   //ObjectPool&& operator=(ObjectPool&&) = delete;
+   ObjectPool() = default;
+   ~ObjectPool() = default;
+
+   ObjectPool(const ObjectPool&) = delete;
+   ObjectPool(ObjectPool&&) = delete;
+   ObjectPool& operator=(const ObjectPool&) = delete;
+   ObjectPool&& operator=(ObjectPool&&) = delete;
 
 };
+#define ObjectPool(T) ObjectPool<T>::Instance()
