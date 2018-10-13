@@ -9,7 +9,7 @@ public:
    static ObjectPool& Instance()
    {
       static ObjectPool instance;
-      return instance;// std::move(instance);
+      return instance;
    }
 
    bool Generate(int _num)
@@ -23,15 +23,13 @@ public:
       return true;
    }
 
-   std::unique_ptr<T>&& GetObject()
+   std::unique_ptr<T> GetObject()
    {
       std::unique_ptr<T> obj = {};
 
       if (m_objects.empty())
       {
-         obj = std::make_unique<T>();
-         
-         return std::move(obj);
+         return std::move(std::make_unique<T>());
       }
       
       obj = std::move(m_objects.front());
