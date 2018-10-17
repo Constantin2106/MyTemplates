@@ -5,12 +5,38 @@
 #include <memory>
 
 //---------------------------------------------------------------------------//
+/*
+Description
+   auto* inst = FactoryFun<Class, argtype1, argtype2, ..., argtypen>(args...);
+   Creates an instance of a Class by means function template
+
+Arguments
+   Arguments of the class constructor
+
+Return
+
+History
+   Created by Kostiantyn Zhelieznov   09/01/2018
+*/
 template<typename T, typename... Arg>
 T* FactoryFun(Arg... args)
 {
    return new T(forward<Arg>(args)...);
 }
 
+/*
+Description
+   auto* inst = Factory<Class, argtype1, argtype2, ..., argntype>(args...);
+   Creates the instance of the Class by means the static function of the class template
+
+Arguments
+   Arguments of the class constructor
+
+Return
+
+History
+   Created by Kostiantyn Zhelieznov   09/01/2018
+*/
 template<typename T, typename... Arg>
 class Factory
 {
@@ -22,6 +48,18 @@ public:
 };
 
 //---------------------------------------------------------------------------//
+/*
+Description
+   auto* inst = static_cast<Class*>(BaseClass::CreateObject("class"));
+   Creates the instance of the Class using map of pair <"class name", pointer_to_creating_function>
+
+Arguments
+
+Return
+
+History
+   Created by Kostiantyn Zhelieznov   09/01/2018
+*/
 class TBaseClass
 {
 public:
@@ -81,7 +119,5 @@ private:
 	const std::string className = "Class_2";
 	std::vector<int> data;
 };
-
-
 
 #endif

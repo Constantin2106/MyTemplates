@@ -58,13 +58,13 @@ private:
 void TemplateFactoryTest()
 {
 
-    Class1* cl1 = Factory<Class1, int, double>::Create(5, 2.6);
-    Class2* cl2 = Factory<Class2, std::string>::Create("type");
+    auto cl1 = Factory<Class1, int, double>::Create(5, 2.6);
+    auto cl2 = Factory<Class2, std::string>::Create("type");
     cout << cl1->GetClassName().c_str() << '\t' << cl1->GetX() << '\t' << cl1->GetY() << endl;
     cout << cl2->GetClassName().c_str() << '\t' << cl2->GetType().c_str() << endl;
 
-    Class1* cl11 = FactoryFun<Class1, int, double>(50, 12.6);
-    Class2* cl21 = FactoryFun<Class2, std::string>("type");
+    auto* cl11 = FactoryFun<Class1, int, double>(50, 12.6);
+    auto* cl21 = FactoryFun<Class2, std::string>("type");
     cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << endl;
     cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << endl;
     
@@ -79,7 +79,7 @@ void TemplateFactoryTest()
 
 void FactoryMethodTest()
 {
-    TClass_1* obj1 = static_cast<TClass_1*>(TBaseClass::CreateObject("class_1"));
+    auto* obj1 = static_cast<TClass_1*>(TBaseClass::CreateObject("class_1"));
     TClass_2* obj2 = static_cast<TClass_2*>(TBaseClass::CreateObject("class_2"));
 
     TBaseClass* obj3 = TBaseClass::CreateObject("11");
