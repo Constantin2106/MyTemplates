@@ -9,7 +9,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\FunctionRef.h">
+    <ClInclude Include="src\FuncRef.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
