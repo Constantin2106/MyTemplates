@@ -1,67 +1,63 @@
 #pragma once
 
-template<typename Value, typename Priority = std::size_t, typename Compare = std::greater<Priority>>
-class CThreadSafePriorityQueue
+#include <mutex>
+#include <map>
+#include <assert.h>
+
+#define Lock(m) std::lock_guard<std::mutex> lock(m)
+
+template<typename V, typename P = std::size_t, typename C = std::greater<P>>
+class PriorityQueue
 {
-   using Key = Priority;
-
-   std::multimap<Key, Value, Compare> m_multimap{};
-
-   mutable std::mutex m_mutex{};
 public:
-   CThreadSafePriorityQueue(void) = default;
-   CThreadSafePriorityQueue(const CThreadSafePriorityQueue&) = delete;
-   CThreadSafePriorityQueue(CThreadSafePriorityQueue&&) = default;
-   CThreadSafePriorityQueue& operator = (const CThreadSafePriorityQueue&) = delete;
-   CThreadSafePriorityQueue& operator = (CThreadSafePriorityQueue&&) = default;
-   ~CThreadSafePriorityQueue(void) = default;
+   PriorityQueue() = default;
+   PriorityQueue(PriorityQueue&&) = default;
+   ~PriorityQueue() = default;
 
-   void Push(const Value& value, const Priority& priority = {})
+   PriorityQueue(const PriorityQueue&) = delete;
+   PriorityQueue& operator = (const PriorityQueue&) = delete;
+   PriorityQueue& operator = (PriorityQueue&&) = default;
+
+   void Push(V&& value, P&& priority = {})
    {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
-
-      this->m_multimap.insert({ priority, value });
-   }
-
-   void Push(Value&& value, Priority&& priority = {})
-   {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
-
-      this->m_multimap.emplace(priority, value);
+      Lock(m_mutex);
+      m_multimap.emplace(priority, value);
    }
 
    auto IsEmpty() const noexcept
    {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
-
-      return this->m_multimap.empty();
+      Lock(m_mutex);
+      return m_multimap.empty();
    }
 
    auto Pop()
    {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
+      Lock(m_mutex);
 
-      assert(!this->m_multimap.empty());
+      if(m_multimap.empty())
+         return V{};
 
-      auto it = std::begin(this->m_multimap);
+      auto it = std::begin(m_multimap);
       auto value = std::move(it->second);
-
-      this->m_multimap.erase(it);
+      m_multimap.erase(it);
 
       return std::move(value);
    }
 
    void Clear()
    {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
-
-      this->m_multimap.clear();
+      Lock(m_mutex);
+      m_multimap.clear();
    }
 
    auto GetSize() const noexcept
    {
-      std::lock_guard<std::mutex> lock(this->m_mutex);
-
-      return this->m_multimap.size();
+      Lock(m_mutex);
+      return m_multimap.size();
    }
+
+private:
+   std::multimap<P, V, C> m_multimap{};
+   mutable std::mutex m_mutex{};
 };
+
