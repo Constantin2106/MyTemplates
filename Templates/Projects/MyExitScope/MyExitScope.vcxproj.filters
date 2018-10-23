@@ -11,4 +11,9 @@
       <UniqueIdentifier>{98004609-7f23-4f5b-b33e-464602197f18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ScopeExit.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

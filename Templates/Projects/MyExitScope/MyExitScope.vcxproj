@@ -146,6 +146,9 @@
   <ItemGroup>
     <ClCompile Include="MyExitScope.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ScopeExit.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
