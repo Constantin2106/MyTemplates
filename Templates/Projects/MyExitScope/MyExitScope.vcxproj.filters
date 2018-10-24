@@ -12,7 +12,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ScopeExit.h">
+    <ClInclude Include="src\ScopeCleaner.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

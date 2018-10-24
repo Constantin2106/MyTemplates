@@ -147,7 +147,7 @@
     <ClCompile Include="MyExitScope.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ScopeExit.h" />
+    <ClInclude Include="src\ScopeCleaner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
