@@ -106,11 +106,12 @@ History
 
 /*
 Description
-   Get length of the queu
+   Get length of the queue
 
 Arguments
 
 Return
+   Number of elements in the queue
 
 History
    Created by Kostiantyn Zhelieznov   10/01/2018
