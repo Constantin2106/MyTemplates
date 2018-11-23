@@ -44,7 +44,7 @@ History
    {
       m_max += _num;
 
-      for (int n = m_objects.size(); n < m_max; ++n)
+      for (size_t n = m_objects.size(); n < m_max; ++n)
       {
          auto obj = std::make_unique<T>();
          m_objects.push_back(std::move(obj));
@@ -118,7 +118,7 @@ History
 */
    std::size_t Count() { return m_objects.size(); }
 
-   /*
+/*
 Description
    ObjectPool(T).Clear()
    Clears the objects pool and calls the destructor for each object.

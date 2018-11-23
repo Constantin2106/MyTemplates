@@ -1,5 +1,7 @@
 #include "Singleton.h"
 
+using namespace Singleton;
+
 TSingleton* TSingleton::instance = nullptr;
 
 TSingleton* TSingleton::Instance()
