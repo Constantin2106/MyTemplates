@@ -5,6 +5,7 @@
 #include <Windows.h>
 
 #include "Log.h"
+//#include "LogUtils.h"
 
 using Timestamp = std::chrono::system_clock::time_point;
 
@@ -85,7 +86,8 @@ Arguments
 History
     Konstantin Zhelieznov              11/21/2018    Add comments to Logger.h
 */
-void SetLogger(std::unique_ptr<ILogger>);
+void SetLogger(std::unique_ptr<ILogger> logger);
+#define UseLogger(Logger) SetLogger(std::make_unique<Logger>())
 
 bool IsEnabled(Severity severity, const char* target);
 

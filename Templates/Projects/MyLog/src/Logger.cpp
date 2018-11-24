@@ -6,10 +6,9 @@
 /*
     Globally shared logger instance, with side-attached destructor
 */
-extern std::atomic<ILogger*> g_logger;
-//namespace {
-
-    //std::atomic<ILogger*> g_logger(nullptr);
+namespace 
+{
+    std::atomic<ILogger*> g_logger{nullptr};
 
     class LoggerDestructor
     {
@@ -17,26 +16,27 @@ extern std::atomic<ILogger*> g_logger;
         LoggerDestructor() = default;
         ~LoggerDestructor()
         {
-            // extract pointer from g_logger and drop it, replacing with nullptr
+            // extract pointer from g_logger 
+            // and drop it, replacing with nullptr
             // TODO: select proper ordering
             delete g_logger.exchange(nullptr);
         }
     };
-
-    //LoggerDestructor g_loggerDestructor;
-//}
+   
+    LoggerDestructor g_loggerDestructor;
+}
 
 /*
     Sets logger implementation
 */
 void SetLogger(std::unique_ptr<ILogger> logger)
 {
-    if (!logger)
+    if(!logger)
         throw std::invalid_argument("logger");
-    
+
     ILogger* expected = nullptr;
     // TODO: select proper ordering
-    if (g_logger.compare_exchange_weak(expected, logger.get()))
+    if(g_logger.compare_exchange_weak(expected, logger.get()))
     {
         logger.release();
     }

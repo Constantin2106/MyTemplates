@@ -156,10 +156,12 @@
   <ItemGroup>
     <ClCompile Include="MyLog.cpp" />
     <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\LogUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\Logger.h" />
+    <ClInclude Include="src\LogUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

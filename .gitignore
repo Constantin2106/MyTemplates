@@ -1,9 +1,3 @@
 Templates/.vs/
 Templates/Bin/
 Templates/Int/
-*.user
-*.obj
-Templates/Projects/MyLog/x64/
-*.exe
-*.ilk
-*.pdb

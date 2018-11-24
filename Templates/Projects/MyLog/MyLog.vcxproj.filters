@@ -5,6 +5,9 @@
     <ClCompile Include="src\Logger.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="src\LogUtils.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -16,6 +19,9 @@
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="src\Logger.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LogUtils.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
