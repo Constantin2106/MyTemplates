@@ -159,7 +159,7 @@
     <ClCompile Include="src\LogUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Log.h" />
+    <ClInclude Include="src\LogData.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\LogUtils.h" />
   </ItemGroup>

@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "Logger.h"
+#include "LogUtils.h"
 
 /*
     Globally shared logger instance, with side-attached destructor
@@ -35,7 +36,6 @@ void SetLogger(std::unique_ptr<ILogger> logger)
         throw std::invalid_argument("logger");
 
     ILogger* expected = nullptr;
-    // TODO: select proper ordering
     if(g_logger.compare_exchange_weak(expected, logger.get()))
     {
         logger.release();
@@ -51,8 +51,8 @@ void SetLogger(std::unique_ptr<ILogger> logger)
 */
 bool IsEnabled(Severity severity, const char* target)
 {
-    // TODO: select proper ordering
-    ILogger* logger = g_logger; // obtain local pointer
+    // Obtain local pointer
+    ILogger* logger = g_logger;
     return logger != nullptr && logger->IsEnabled(Metadata{ severity, target });
 }
 
@@ -72,8 +72,8 @@ std::string FormatStr(const char* format, va_list args)
 
 void Write(Severity severity, const char* target, Location loc, const char* format, ...)
 {
-    // TODO: select proper ordering
-    ILogger* logger = g_logger; // obtain local pointer
+    // Obtain local pointer
+    ILogger* logger = g_logger; 
     if (logger == nullptr)
     {
         return;
@@ -94,3 +94,17 @@ void Write(Severity severity, const char* target, Location loc, const char* form
 
     logger->Write(rec);
 }
+
+//-----------------------------------------------------------------------//
+//                          Console Logger                               //
+//-----------------------------------------------------------------------//
+void ConsoleLogger::Write(const Record& record)
+{
+    auto str = FormatRecord(record, "ThreadId-${tid} -- ${file} -- line-${line} -- ${sev} -- ${msg}");
+
+    ::OutputDebugStringA("/****************************************************************/\r\n");
+    ::OutputDebugStringA(str.c_str());
+    ::OutputDebugStringA("\r\n");
+}
+
+//-----------------------------------------------------------------------//

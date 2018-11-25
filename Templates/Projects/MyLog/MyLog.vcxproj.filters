@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Log.h">
-      <Filter>Src</Filter>
-    </ClInclude>
     <ClInclude Include="src\Logger.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="src\LogUtils.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LogData.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,36 +3,31 @@
 #include <vld.h>
 
 #include "src\Logger.h"
+#include "src\LogUtils.h"
 
 #include <conio.h>
 #include <iostream>
-#include <atomic>
 
 int main()
 {
-    UseLogger(ConsoleLogger);
-    /*// 4. Construct file logger path
-    std::wstring fileLogPath;
-    {
-        auto logsPath = appDataPath + L"\\Logs\\";
-        // 4a. Form name for log file; use pattern YYYY-MM-DD_HH-MM-SS_MMM.log
-        // We have time formatting in diag::FormatRecord, so simply use it
-        diag::Record rec;
-        rec.timestamp = std::chrono::system_clock::now();
-        auto name = diag::FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}_${ms}.log");
-        // 4b. Append file name to overall path
-        string::EncodingConverter<string::Encoding::Utf8, string::Encoding::Wide> utf16;
-        utf16.Convert(name, &logsPath);
-        fileLogPath = std::move(logsPath);
-    }*/
-
-    int val = 10;
-    LogError("Value is: %d", val);
-    
     Record rec;
     rec.timestamp = std::chrono::system_clock::now();
 
-    //auto str = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}_${ms}.log");
+    auto str = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}.log");
+    std::cout << str.c_str() << std::endl;
+
+    UseLogger(ConsoleLogger);
+
+    int val = 10;
+    LogError("Value is: %d", val);
+    LogWarn("Value is: %d", val);
+    LogInfo("Value is: %d", val);
+    LogDebug("Value is: %d", val);
+
+    LogErrorIf(val == 10, "Value is: %d", val);
+    LogWarnIf(val == 10, "Value is: %d", val);
+    LogInfoIf(val != 10, "Value is: %d", val);
+    LogDebugIf(val == 10, "Value is: %d", val);
 
     _getch();
 

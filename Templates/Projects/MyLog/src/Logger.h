@@ -1,42 +1,9 @@
 #pragma once
 
-#include <chrono>
 #include <memory>
 #include <Windows.h>
 
-#include "Log.h"
-//#include "LogUtils.h"
-
-using Timestamp = std::chrono::system_clock::time_point;
-
-/*
-Description
-    Information which participates in deciding whether to write message.
-
-History
-    Konstantin Zhelieznov              11/21/2018    Add comments to Logger.h
-*/
-struct Metadata
-{
-    Severity severity;
-    const char* target;
-};
-
-/*
-Description
-    Full logging message payload.
-
-History
-    Konstantin Zhelieznov              11/21/2018    Add comments to Logger.h
-*/
-struct Record
-{
-    Metadata    metadata;
-    Location    location;
-    Timestamp   timestamp;
-    uintptr_t   threadId;
-    const char* message;
-};
+#include "LogData.h"
 
 /*
 Description
@@ -65,14 +32,7 @@ public:
     ConsoleLogger() { }
 
     bool IsEnabled(const Metadata&) override { return true; }
-    void Write(const Record& record) override 
-    {
-        // FIXME: desyncs during output?
-        ::OutputDebugStringA("\r\n");
-        ::OutputDebugStringA("\t\t");
-        ::OutputDebugStringA(record.message);
-        ::OutputDebugStringA("\r\n");
-    }
+    void Write(const Record& record) override;
 };
 
 /*
