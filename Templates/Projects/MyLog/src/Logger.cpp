@@ -100,11 +100,11 @@ void Write(Severity severity, const char* target, Location loc, const char* form
 //-----------------------------------------------------------------------//
 void ConsoleLogger::Write(const Record& record)
 {
-    auto str = FormatRecord(record, "ThreadId-${tid} -- ${file} -- line-${line} -- ${sev} -- ${msg}");
+    auto str = FormatRecord(record, "${sev} ThreadId-${tid} -- ${file} -- line-${line}\n\t\t${msg}");
 
-    ::OutputDebugStringA("/****************************************************************/\r\n");
+    ::OutputDebugStringA("/****************************************************************/\n");
     ::OutputDebugStringA(str.c_str());
-    ::OutputDebugStringA("\r\n");
+    ::OutputDebugStringA("\n");
 }
 
 //-----------------------------------------------------------------------//
