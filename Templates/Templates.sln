@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExitScope", "Projects\MyE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyLog", "Projects\MyLog\MyLog.vcxproj", "{6D873423-4DD0-40CF-99A8-A4B5C9DB670B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyOneDrive", "Projects\MyOneDrive\MyOneDrive.vcxproj", "{28368ACE-729B-4144-B49E-BFB2D8617BEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -173,6 +175,14 @@ Global
 		{6D873423-4DD0-40CF-99A8-A4B5C9DB670B}.Release|x64.Build.0 = Release|x64
 		{6D873423-4DD0-40CF-99A8-A4B5C9DB670B}.Release|x86.ActiveCfg = Release|Win32
 		{6D873423-4DD0-40CF-99A8-A4B5C9DB670B}.Release|x86.Build.0 = Release|Win32
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Debug|x64.ActiveCfg = Debug|x64
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Debug|x64.Build.0 = Debug|x64
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Debug|x86.ActiveCfg = Debug|Win32
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Debug|x86.Build.0 = Debug|Win32
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Release|x64.ActiveCfg = Release|x64
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Release|x64.Build.0 = Release|x64
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Release|x86.ActiveCfg = Release|Win32
+		{28368ACE-729B-4144-B49E-BFB2D8617BEA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
