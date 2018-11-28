@@ -76,7 +76,7 @@ void Write_line(std::string& buffer, const Record& rec, const TmExt&)
 void Write_sev(std::string& buffer, const Record& rec, const TmExt&)
 {
     const char* sevName = " ??? ";
-    switch(rec.metadata.severity)
+    switch(rec.severity)
     {
         case Severity::Error:   sevName = "ERROR"; break;
         case Severity::Warning: sevName = "WARN "; break;

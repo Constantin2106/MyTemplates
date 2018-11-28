@@ -28,28 +28,14 @@ struct Location
 };
 
 /*
-    Information which participates in deciding whether to write message.
-*/
-struct Metadata
-{
-    Severity severity;
-    const char* target;
-};
-
-/*
     Full logging message payload.
 */
 using Timestamp = std::chrono::system_clock::time_point;
 struct Record
 {
-    Metadata    metadata;
+    Severity    severity;
     Location    location;
     Timestamp   timestamp;
     uintptr_t   threadId;
     const char* message;
 };
-/* 
-    Enables ADL-based deduction on which "log target" function to use
-*/
-struct AdlTag
-{};

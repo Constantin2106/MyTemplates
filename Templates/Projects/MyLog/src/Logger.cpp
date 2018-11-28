@@ -49,11 +49,11 @@ void SetLogger(std::unique_ptr<ILogger> logger)
 /*
     Checks the logger enabled
 */
-bool IsEnabled(Severity severity, const char* target)
+bool IsEnabled()
 {
     // Obtain local pointer
     ILogger* logger = g_logger;
-    return logger != nullptr && logger->IsEnabled(Metadata{ severity, target });
+    return logger != nullptr && logger->IsEnabled();
 }
 
 std::string FormatStr(const char* format, va_list args)
@@ -70,7 +70,7 @@ std::string FormatStr(const char* format, va_list args)
     return std::string(buff.get());
 }
 
-void Write(Severity severity, const char* target, Location loc, const char* format, ...)
+void Write(Severity severity, Location loc, const char* format, ...)
 {
     // Obtain local pointer
     ILogger* logger = g_logger; 
@@ -85,7 +85,7 @@ void Write(Severity severity, const char* target, Location loc, const char* form
     va_end(args);
 
     Record rec{
-        Metadata { severity, target },
+        severity,
         loc,
         std::chrono::system_clock::now(),
         ::GetCurrentThreadId(),

@@ -27,25 +27,9 @@ Arguments
 
 Return
     Returns the record, formatted as text
-
-History
-    Konstantin Zhelieznov              11/21/2018    Add comments to LogUtils.h
 */
 std::string FormatRecord(const Record& record, std::string format);
 
-
-using Target = const char*;
-
-// Returns default log target, nullptr in our case
-static constexpr Target GetLogTarget(...)
-{
-    return nullptr;
-}
-
-/*
-    Substitutes with current 'target' defined in current translation unit
-*/
-#define LogCurrentTarget (GetLogTarget(AdlTag {}))
 
 /*
     Substitutes with current loation object, which contains current file and line
@@ -60,12 +44,12 @@ static constexpr Target GetLogTarget(...)
     @param[in] $location    file and line which should be used in log message as location
     @param[in] $format      formatting string for message
 */
-#define LogWriteRaw($severity, $target, $location, $format, ...)        \
-    (                                                                   \
-        IsEnabled($severity, $target)                                   \
-        ? Write($severity, $target, $location, $format, __VA_ARGS__)    \
-        : (void())                                                      \
-    )                                                                   \
+#define LogWriteRaw($severity, $location, $format, ...)        \
+    (                                                          \
+        IsEnabled()                                   \
+        ? Write($severity, $location, $format, __VA_ARGS__)    \
+        : (void())                                             \
+    )                                                          \
 
 /*
     Logging macros which are specialized by severity but allow to specify custom target and location
@@ -76,19 +60,19 @@ static constexpr Target GetLogTarget(...)
     @param[in] $location    File and line where logging happens
     @param[in] $format      Format string
 */
-#define LogErrorAt($target, $location, $format, ...) LogWriteRaw(Severity::Error,   $target, $location, $format, __VA_ARGS__)
-#define LogWarnAt( $target, $location, $format, ...) LogWriteRaw(Severity::Warning, $target, $location, $format, __VA_ARGS__)
-#define LogInfoAt( $target, $location, $format, ...) LogWriteRaw(Severity::Info,    $target, $location, $format, __VA_ARGS__)
-#define LogDebugAt($target, $location, $format, ...) LogWriteRaw(Severity::Debug,   $target, $location, $format, __VA_ARGS__)
+#define LogErrorAt($location, $format, ...) LogWriteRaw(Severity::Error,   $location, $format, __VA_ARGS__)
+#define LogWarnAt( $location, $format, ...) LogWriteRaw(Severity::Warning, $location, $format, __VA_ARGS__)
+#define LogInfoAt( $location, $format, ...) LogWriteRaw(Severity::Info,    $location, $format, __VA_ARGS__)
+#define LogDebugAt($location, $format, ...) LogWriteRaw(Severity::Debug,   $location, $format, __VA_ARGS__)
 
 // Hard, unrecoverable error
-#define LogError($format, ...) LogErrorAt(LogCurrentTarget, LogCurrentLocation, $format, __VA_ARGS__)
+#define LogError($format, ...) LogErrorAt(LogCurrentLocation, $format, __VA_ARGS__)
 // An error which can be possibly handled somewhere up the code hierarchy
-#define LogWarn($format,  ...) LogWarnAt( LogCurrentTarget, LogCurrentLocation, $format, __VA_ARGS__)
+#define LogWarn($format,  ...) LogWarnAt( LogCurrentLocation, $format, __VA_ARGS__)
 // Informational message
-#define LogInfo($format,  ...) LogInfoAt( LogCurrentTarget, LogCurrentLocation, $format, __VA_ARGS__)
+#define LogInfo($format,  ...) LogInfoAt( LogCurrentLocation, $format, __VA_ARGS__)
 // Debug data, like state of some structure after operation
-#define LogDebug($format, ...) LogDebugAt(LogCurrentTarget, LogCurrentLocation, $format, __VA_ARGS__)
+#define LogDebug($format, ...) LogDebugAt(LogCurrentLocation, $format, __VA_ARGS__)
 
 /*
     Conditional logging macros - use these to write messages to log under certain condition
