@@ -2,9 +2,7 @@
 
 #include <chrono>
 
-/*
-Importance level of log message
-*/
+// Importance level of log message
 enum class Severity
 {
     // Used to set a first level with 1
@@ -18,18 +16,14 @@ enum class Severity
     _Count
 };
 
-/*
-    Defines log location
-*/
+// Defines log location
 struct Location
 {
     const char* file;
     int         line;
 };
 
-/*
-    Full logging message payload.
-*/
+// Full logging message payload.
 using Timestamp = std::chrono::system_clock::time_point;
 struct Record
 {

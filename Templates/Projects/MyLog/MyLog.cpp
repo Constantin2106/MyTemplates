@@ -12,11 +12,11 @@ int main()
 {
     Record rec;
     rec.timestamp = std::chrono::system_clock::now();
-
     auto str = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}.log");
     std::cout << str.c_str() << std::endl;
 
-    UseLogger(ConsoleLogger);
+    //UseLogger(ConsoleLogger);
+    UseLogger(FileLogger);
 
     int val = 10;
     LogError("Value is: %d", val);
@@ -28,6 +28,8 @@ int main()
     LogWarnIf(val == 10, "Value is: %d", val);
     LogInfoIf(val != 10, "Value is: %d", val);
     LogDebugIf(val == 10, "Value is: %d", val);
+
+
 
     _getch();
 

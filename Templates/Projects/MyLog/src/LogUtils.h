@@ -46,33 +46,22 @@ std::string FormatRecord(const Record& record, std::string format);
 */
 #define LogWriteRaw($severity, $location, $format, ...)        \
     (                                                          \
-        IsEnabled()                                   \
+        IsEnabled()                                            \
         ? Write($severity, $location, $format, __VA_ARGS__)    \
         : (void())                                             \
     )                                                          \
 
 /*
-    Logging macros which are specialized by severity but allow to specify custom target and location
-    May be used in cases where logging macro is invoked through some intermediate code,
-    and what matters is the invocation site of that code
-
-    @param[in] $target      Target name
-    @param[in] $location    File and line where logging happens
-    @param[in] $format      Format string
+    Logging macros - the location and severity are set automatically.
 */
-#define LogErrorAt($location, $format, ...) LogWriteRaw(Severity::Error,   $location, $format, __VA_ARGS__)
-#define LogWarnAt( $location, $format, ...) LogWriteRaw(Severity::Warning, $location, $format, __VA_ARGS__)
-#define LogInfoAt( $location, $format, ...) LogWriteRaw(Severity::Info,    $location, $format, __VA_ARGS__)
-#define LogDebugAt($location, $format, ...) LogWriteRaw(Severity::Debug,   $location, $format, __VA_ARGS__)
-
 // Hard, unrecoverable error
-#define LogError($format, ...) LogErrorAt(LogCurrentLocation, $format, __VA_ARGS__)
+#define LogError($format, ...) LogWriteRaw(Severity::Error, LogCurrentLocation, $format, __VA_ARGS__)
 // An error which can be possibly handled somewhere up the code hierarchy
-#define LogWarn($format,  ...) LogWarnAt( LogCurrentLocation, $format, __VA_ARGS__)
+#define LogWarn($format, ...) LogWriteRaw(Severity::Warning, LogCurrentLocation, $format, __VA_ARGS__)
 // Informational message
-#define LogInfo($format,  ...) LogInfoAt( LogCurrentLocation, $format, __VA_ARGS__)
+#define LogInfo($format,  ...) LogWriteRaw(Severity::Info, LogCurrentLocation, $format, __VA_ARGS__)
 // Debug data, like state of some structure after operation
-#define LogDebug($format, ...) LogDebugAt(LogCurrentLocation, $format, __VA_ARGS__)
+#define LogDebug($format, ...) LogWriteRaw(Severity::Debug, LogCurrentLocation, $format, __VA_ARGS__)
 
 /*
     Conditional logging macros - use these to write messages to log under certain condition
