@@ -46,7 +46,7 @@ std::string FormatRecord(const Record& record, std::string format);
 */
 #define LogWriteRaw($severity, $location, $format, ...)        \
     (                                                          \
-        IsEnabled()                                   \
+        IsEnabled()                                            \
         ? Write($severity, $location, $format, __VA_ARGS__)    \
         : (void())                                             \
     )                                                          \

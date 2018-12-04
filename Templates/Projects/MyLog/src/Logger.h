@@ -1,16 +1,21 @@
 #pragma once
 
 #include <memory>
+#include <experimental/filesystem>
+#include <mutex>
+#include <fstream>
 #include <Windows.h>
 
 #include "LogData.h"
+
+namespace fs = std::experimental::filesystem;
 
 /*
 Description
     Common interface for all logger implementations.
 
 History
-    Konstantin Zhelieznov              11/21/2018    Add comments to Logger.h
+    Konstantin Zhelieznov              11/21/2018    Created.
 */
 class ILogger
 {
@@ -29,10 +34,38 @@ Description
 class ConsoleLogger : public ILogger
 {
 public:
-    ConsoleLogger() { }
+    ConsoleLogger() {}
 
-    bool IsEnabled() override { return true; }
+    bool IsEnabled() override;
     void Write(const Record& record) override;
+};
+
+/*
+Description
+    Dumps message from record to specified file
+    Does not perform any checks
+
+    NB: it's movable, though std::once_flag is not - must settle in place before first write
+*/
+class FileLogger : public ILogger
+{
+public:
+    FileLogger();
+    FileLogger(const std::string& path);
+
+    FileLogger(FileLogger const&) = delete;
+    FileLogger& operator=(FileLogger const&) = delete;
+
+    FileLogger(FileLogger&&);
+    FileLogger& operator=(FileLogger&&);
+
+    bool IsEnabled() override;
+    void Write(const Record& record) override;
+
+private:
+    fs::path m_path;
+    std::once_flag m_onceFlag;
+    std::ofstream m_file;
 };
 
 /*

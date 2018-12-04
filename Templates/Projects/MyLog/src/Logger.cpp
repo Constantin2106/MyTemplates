@@ -1,12 +1,11 @@
 #include <atomic>
 #include <stdexcept>
+#include <assert.h>
 
 #include "Logger.h"
 #include "LogUtils.h"
 
-/*
-    Globally shared logger instance, with side-attached destructor
-*/
+// Globally shared logger instance, with side-attached destructor
 namespace 
 {
     std::atomic<ILogger*> g_logger{nullptr};
@@ -27,9 +26,7 @@ namespace
     LoggerDestructor g_loggerDestructor;
 }
 
-/*
-    Sets logger implementation
-*/
+// Sets logger implementation
 void SetLogger(std::unique_ptr<ILogger> logger)
 {
     if(!logger)
@@ -46,9 +43,7 @@ void SetLogger(std::unique_ptr<ILogger> logger)
     }
 }
 
-/*
-    Checks the logger enabled
-*/
+// Checks the logger enabled
 bool IsEnabled()
 {
     // Obtain local pointer
@@ -56,6 +51,7 @@ bool IsEnabled()
     return logger != nullptr && logger->IsEnabled();
 }
 
+// Format string
 std::string FormatStr(const char* format, va_list args)
 {
     auto buff_size = vsnprintf(nullptr, 0, format, args);
@@ -70,6 +66,7 @@ std::string FormatStr(const char* format, va_list args)
     return std::string(buff.get());
 }
 
+// Write message into log
 void Write(Severity severity, Location loc, const char* format, ...)
 {
     // Obtain local pointer
@@ -98,13 +95,81 @@ void Write(Severity severity, Location loc, const char* format, ...)
 //-----------------------------------------------------------------------//
 //                          Console Logger                               //
 //-----------------------------------------------------------------------//
+bool ConsoleLogger::IsEnabled()
+{
+    return true;
+}
+
 void ConsoleLogger::Write(const Record& record)
 {
-    auto str = FormatRecord(record, "${sev} ThreadId-${tid} -- ${file} -- line-${line}\n\t\t${msg}");
+    auto message = FormatRecord(record, "${sev} ThreadId-${tid} -- ${file} -- line-${line}\n\t\t${msg}");
 
     ::OutputDebugStringA("/****************************************************************/\n");
-    ::OutputDebugStringA(str.c_str());
+    ::OutputDebugStringA(message.c_str());
     ::OutputDebugStringA("\n");
+}
+
+
+//-----------------------------------------------------------------------//
+//                            File Logger                                //
+//-----------------------------------------------------------------------//
+FileLogger::FileLogger()
+{
+    Record rec;
+    rec.timestamp = std::chrono::system_clock::now();
+    auto name = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}.log");
+
+    m_path = fs::current_path() / "Log" / name;
+}
+
+FileLogger::FileLogger(const std::string& path) : m_path(std::move(path))
+{}
+
+FileLogger::FileLogger(FileLogger&& other) : m_path(std::move(other.m_path)),
+                                             m_file(std::move(other.m_file))
+{
+    assert(!m_file.is_open());
+}
+
+FileLogger& FileLogger::operator=(FileLogger&& other)
+{
+    assert(!m_file.is_open() && !other.m_file.is_open());
+    if (this != &other)
+    {
+        m_path = std::move(other.m_path);
+        m_file = std::move(other.m_file);
+    }
+    return *this;
+}
+
+bool FileLogger::IsEnabled()
+{
+    return !m_path.empty();
+}
+
+void FileLogger::Write(const Record& record)
+{
+    std::call_once(m_onceFlag, 
+                   [&]() {
+                       // Create folder for log file
+                       std::error_code errCode;
+                       fs::create_directories(m_path.parent_path(), errCode);
+                       if (errCode)
+                       {
+                           // TODO: errCode should be handled
+                           // Return without opening file, means we can't create target dir properly
+                           return;
+                       }
+
+                       // Open log file; if it fails, file will not be open - and so subsequent reads will not happen
+                       m_file.open(m_path.c_str(), std::ios_base::ate | std::ios_base::out);
+                   });
+
+    if (m_file.is_open())
+    {
+        auto message = FormatRecord(record, "${sev} ThreadId-${tid} -- ${file} -- line-${line}\n\t\t${msg}");
+        m_file << message << std::endl;
+    }
 }
 
 //-----------------------------------------------------------------------//
