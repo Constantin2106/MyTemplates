@@ -4,7 +4,6 @@
 #include <experimental/filesystem>
 #include <mutex>
 #include <fstream>
-#include <Windows.h>
 
 #include "LogData.h"
 
@@ -51,7 +50,6 @@ class FileLogger : public ILogger
 {
 public:
     FileLogger();
-    FileLogger(const std::string& path);
 
     FileLogger(FileLogger const&) = delete;
     FileLogger& operator=(FileLogger const&) = delete;
@@ -76,7 +74,7 @@ Description
 Arguments
     logger - unique pointer to logger object
 */
-void SetLogger(std::unique_ptr<ILogger> logger);
+bool SetLogger(std::unique_ptr<ILogger> logger);
 #define UseLogger(Logger) SetLogger(std::make_unique<Logger>())
 
 bool IsEnabled();

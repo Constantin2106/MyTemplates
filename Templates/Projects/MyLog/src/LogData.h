@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <Windows.h>
 
 // Importance level of log message
 enum class Severity
@@ -32,4 +33,17 @@ struct Record
     Timestamp   timestamp;
     uintptr_t   threadId;
     const char* message;
+
+    Record()
+    {
+        timestamp = std::chrono::system_clock::now();
+        threadId = ::GetCurrentThreadId();
+    }
+
+    Record(Severity _severity, Location _location, const char* _message) : Record()
+    {
+        severity = _severity;
+        location = _location;
+        message = _message;
+    }
 };

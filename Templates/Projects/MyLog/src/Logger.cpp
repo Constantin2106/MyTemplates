@@ -27,20 +27,19 @@ namespace
 }
 
 // Sets logger implementation
-void SetLogger(std::unique_ptr<ILogger> logger)
+bool SetLogger(std::unique_ptr<ILogger> _logger)
 {
-    if(!logger)
-        throw std::invalid_argument("logger");
-
-    ILogger* expected = nullptr;
-    if(g_logger.compare_exchange_weak(expected, logger.get()))
+    // Obtain local pointer
+    ILogger* logger = g_logger;
+    if (nullptr == logger)
     {
-        logger.release();
+        // Move _logger to g_logger
+        g_logger.exchange(_logger.release());
+        return true;
     }
-    else
-    {
-        throw std::logic_error("Logger already initialized");
-    }
+    
+    delete _logger.release();
+    return false;
 }
 
 // Checks the logger enabled
@@ -81,13 +80,7 @@ void Write(Severity severity, Location loc, const char* format, ...)
     auto message =  FormatStr(format, args);
     va_end(args);
 
-    Record rec{
-        severity,
-        loc,
-        std::chrono::system_clock::now(),
-        ::GetCurrentThreadId(),
-        message.c_str()
-    };
+    Record rec(severity, loc, message.c_str());
 
     logger->Write(rec);
 }
@@ -116,14 +109,10 @@ void ConsoleLogger::Write(const Record& record)
 FileLogger::FileLogger()
 {
     Record rec;
-    rec.timestamp = std::chrono::system_clock::now();
     auto name = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}.log");
 
     m_path = fs::current_path() / "Log" / name;
 }
-
-FileLogger::FileLogger(const std::string& path) : m_path(std::move(path))
-{}
 
 FileLogger::FileLogger(FileLogger&& other) : m_path(std::move(other.m_path)),
                                              m_file(std::move(other.m_file))
@@ -133,9 +122,10 @@ FileLogger::FileLogger(FileLogger&& other) : m_path(std::move(other.m_path)),
 
 FileLogger& FileLogger::operator=(FileLogger&& other)
 {
-    assert(!m_file.is_open() && !other.m_file.is_open());
     if (this != &other)
     {
+        assert(!m_file.is_open() && !other.m_file.is_open());
+
         m_path = std::move(other.m_path);
         m_file = std::move(other.m_file);
     }
