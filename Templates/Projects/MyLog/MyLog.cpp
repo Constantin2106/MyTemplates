@@ -11,13 +11,15 @@
 int main()
 {
     Record rec;
-    rec.timestamp = std::chrono::system_clock::now();
     auto str = FormatRecord(rec, "${year}-${mon}-${day}_${h}-${m}-${s}.log");
     std::cout << str.c_str() << std::endl;
 
     //UseLogger(ConsoleLogger);
-    UseLogger(FileLogger);
-
+    bool isSet = UseLogger(FileLogger);
+    std::cout << "First Log setting: " << std::boolalpha << isSet << std::endl;
+    isSet = UseLogger(FileLogger);
+    std::cout << "Second Log setting: " << std::boolalpha << isSet << std::endl;
+ 
     int val = 10;
     LogError("Value is: %d", val);
     LogWarn("Value is: %d", val);
