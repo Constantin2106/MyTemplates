@@ -2,23 +2,23 @@
 
 #include "HttpDataStruct.h"
 
-bool HttpOpenSyncSession(HINTERNET& _hSession, SessionData& _session);
+bool HttpOpenSyncSession(HINTERNET& hSession, const SessionData& session);
 
-bool HttpConnectToServer(HINTERNET& _hConnect, HINTERNET _hSession, ConnectData& _connect);
+bool HttpConnectToServer(HINTERNET& hCconnect, const HINTERNET hSession, const ConnectData& connect);
 
-bool HttpCreateRequest(HINTERNET& _hRequest, HINTERNET _hConnect, CreateRequest& _createReq);
+bool HttpCreateRequest(HINTERNET& hRequest, const HINTERNET hCconnect, const CreateRequest& createReq);
 
-bool HttpAddHeaders(HINTERNET& _hRequest, RequestHeaders& _reqHeaders);
+bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders);
 
-bool HttpSendRequest(HINTERNET _hRequest, SendRequest& _sendReq);
+bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, bool checkCertificate = false);
 
-bool HttpWaitAnswer(HINTERNET hRequest, LPVOID _reserved = {});
+bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID _reserved = {});
 
-bool HttpReadHeaders(HINTERNET& _hRequest, ResponseHeaders& _resHeaders, std::wstring& _headers);
+bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& _headers);
 
 bool HttpDataAvailable(HINTERNET _hRequest);
 
-bool HttpReadAnswer(HINTERNET& _hRequest, std::string& _answer, std::wstring& _errorMessage);
+bool HttpReadAnswer(const HINTERNET& hRequest, std::string& _answer, std::wstring& _errorMessage);
 
 bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest);
 

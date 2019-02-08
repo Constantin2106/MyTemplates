@@ -6,6 +6,7 @@
 #include <sstream>
 //#include <iomanip>
 //#include <vector>
+//#include <memory>
 
 #pragma comment( lib, "oleaut32.lib" )
 
@@ -45,7 +46,7 @@ struct SessionData
 {
    std::wstring _agent{ _T("agent") };
 
-   DWORD _accessType = ACCESS_TYPE(NO_PROXY);
+   DWORD _accessType = ACCESS_TYPE(DEF_PROXY);
    LPCWSTR _proxyName = WINHTTP_NO_PROXY_NAME;
    LPCWSTR _proxyBypass = WINHTTP_NO_PROXY_BYPASS;
    DWORD _sessionFlags{};
@@ -57,7 +58,7 @@ struct ConnectData
 };
 struct CreateRequest
 {
-   LPCWSTR _verb = nullptr;
+   LPCWSTR _verb = VERB(GET);
    DWORD _requestFlags = FLAGS(SECURE);
    std::wstring _objName;
    LPCWSTR _version{};

@@ -15,6 +15,8 @@ public:
    void SetParam(RequestData&& _rqData)
    {
       m_request = std::move(_rqData);
+	  m_request._connect._port = m_request._createReq._requestFlags & FLAGS(SECURE) 
+							? PORT(HTTPS_PORT) : PORT(HTTP_PORT);
    }
 
    RequestResult syncRequest()
@@ -39,7 +41,7 @@ public:
          RETURN_ERROR(result);
       }
 
-      if (!HttpSendRequest(hRequest, m_request._sendReq))
+      if (!HttpSendRequest(hRequest, m_request._sendReq, m_request._connect._port == PORT(HTTPS_PORT)))
       {
          RETURN_ERROR(result);
       }

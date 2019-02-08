@@ -1,243 +1,286 @@
-
+#include <iostream>
 #include <vector>
 
 #include "HttpClientHelper.h"
 
-bool HttpOpenSyncSession(HINTERNET& _hSession, SessionData& _session)
+static void CALLBACK HttpClientCallback(
+                HINTERNET hInternet,
+                DWORD_PTR context,
+                DWORD status,
+                LPVOID statusInfo,
+                DWORD statusInfoLength)
 {
-   _hSession = WinHttpOpen(
-      _session._agent.c_str()
-      , _session._accessType
-      , _session._proxyName
-      , _session._proxyBypass
-      , _session._sessionFlags);
+    if (WINHTTP_CALLBACK_FLAG_SECURE_FAILURE == status)
+    {
+		std::cout << std::endl << std::endl << "Secure failure" << std::endl;
+		DWORD stInfo = *((DWORD*)statusInfo);
 
-   return NULL != _hSession;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
+		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
+			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
+    }
 }
 
-bool HttpConnectToServer(HINTERNET& _hConnect, HINTERNET _hSession, ConnectData& _connect)
+bool HttpOpenSyncSession(HINTERNET& hSession, const SessionData& session)
 {
-   _hConnect = WinHttpConnect(
-      _hSession
-      , _connect._server.c_str()
-      , _connect._port, 0);
+    hSession = ::WinHttpOpen(
+                session._agent.c_str(),
+                session._accessType,
+                session._proxyName,
+                session._proxyBypass,
+                session._sessionFlags);
 
-   return NULL != _hConnect;
+    return NULL != hSession;
 }
 
-bool HttpCreateRequest(HINTERNET& _hRequest, HINTERNET _hConnect, CreateRequest& _createReq)
+bool HttpConnectToServer(HINTERNET& hCconnect, const HINTERNET hSession, const ConnectData& connect)
 {
-   _hRequest = WinHttpOpenRequest(
-      _hConnect
-      , _createReq._verb
-      , _createReq._objName.c_str()
-      , _createReq._version
-      , _createReq._referrer
-      , _createReq._acceptTypes
-      , _createReq._requestFlags);
+    hCconnect = ::WinHttpConnect(
+                 hSession,
+                 connect._server.c_str(),
+                 connect._port, 0);
 
-   return NULL != _hRequest;
+    return NULL != hCconnect;
 }
 
-bool HttpAddHeaders(HINTERNET& _hRequest, RequestHeaders& _reqHeaders)
+bool HttpCreateRequest(HINTERNET& hRequest, const HINTERNET hCconnect, const CreateRequest& createReq)
 {
-   return TRUE == WinHttpAddRequestHeaders(
-      _hRequest
-      , _reqHeaders._headers.c_str()
-      , ULONG(-1L)
-      , _reqHeaders._modifiers);
+    hRequest = ::WinHttpOpenRequest(
+                hCconnect,
+                createReq._verb,
+                createReq._objName.c_str(),
+                createReq._version,
+                createReq._referrer,
+                createReq._acceptTypes,
+                createReq._requestFlags);
+
+    return NULL != hRequest;
 }
 
-bool HttpSendRequest(HINTERNET _hRequest, SendRequest& _sendReq)
+bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders)
 {
-   return TRUE == WinHttpSendRequest(
-      _hRequest
-      , _sendReq._headers
-      , _sendReq._headersLength
-      , _sendReq._optional
-      , _sendReq._optionalLength
-      , _sendReq._totalLength
-      , _sendReq._context);
+    return TRUE == ::WinHttpAddRequestHeaders(
+                    hRequest,
+                    reqHeaders._headers.c_str(),
+                    ULONG(-1L),
+                    reqHeaders._modifiers);
 }
 
-bool HttpWaitAnswer(HINTERNET _hRequest, LPVOID _reserved/* = NULL*/)
+bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, bool checkCertificate/* = false*/)
 {
-   return TRUE == WinHttpReceiveResponse(_hRequest, _reserved);
+    if (checkCertificate)
+    {
+        WINHTTP_STATUS_CALLBACK isCallback = ::WinHttpSetStatusCallback(
+                            hRequest,
+                            reinterpret_cast<WINHTTP_STATUS_CALLBACK>(HttpClientCallback),
+                            WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
+
+        if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
+        {
+            auto err = GetLastError();
+
+        }
+    }
+
+    return TRUE == ::WinHttpSendRequest(
+                    hRequest,
+                    sendReq._headers,
+                    sendReq._headersLength,
+                    sendReq._optional,
+                    sendReq._optionalLength,
+                    sendReq._totalLength,
+                    sendReq._context);
 }
 
-bool HttpReadHeaders( HINTERNET& _hRequest, ResponseHeaders& _resHeaders, std::wstring& _headers)
+bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
 {
-   DWORD hdSize{};
-   BOOL bResult = FALSE;
-   DWORD downloaded{};
-
-   _headers.clear();
-
-   // Use WinHttpQueryHeaders to obtain the size of the buffer.
-   if (WinHttpQueryHeaders(
-      _hRequest
-      , _resHeaders._infoLevel
-      , _resHeaders._name
-      , NULL, &hdSize
-      , _resHeaders._index))
-   {
-      return false;
-   }
-
-   if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-   {
-      return false;
-   }
-
-   if (0 == hdSize)
-   {
-      return false;
-   }
-
-   // Allocate memory for the buffer.
-   BYTE* buffer{};
-   try
-   {
-      buffer = new BYTE[hdSize + 1];
-   }
-   catch (std::bad_alloc&)
-   {
-      return false;
-   }
-
-   ZeroMemory(buffer, hdSize);
-
-   // Use WinHttpQueryHeaders to retrieve the header.
-   bResult = WinHttpQueryHeaders(
-      _hRequest
-      , _resHeaders._infoLevel
-      , _resHeaders._name
-      , buffer, &hdSize
-      , _resHeaders._index);
-
-   if (bResult)
-   {
-      _headers.assign(reinterpret_cast<PTCHAR>(buffer));
-   }
-
-   return TRUE == bResult;
+    return TRUE == ::WinHttpReceiveResponse(hRequest, reserved);
 }
 
-bool HttpReadAnswer( HINTERNET& _hRequest, std::string& _answer, std::wstring& _errorMessage)
+bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& headers)
 {
-   DWORD dataSize{};
-   DWORD downloadedData{};
-   BYTE* dataBuffer{};
+    DWORD hdSize{};
+    BOOL bResult = FALSE;
+    DWORD downloaded{};
 
-   _answer.clear();
-   _errorMessage.assign(_T("Succeeded\n"));
+    headers.clear();
 
-   while (true)
-   {
-      // Check for data available
-      if (!WinHttpQueryDataAvailable(_hRequest, &dataSize))
-      {
-         _errorMessage = std::wstring(_T("Error ")) 
-            + std::to_wstring(GetLastError()) 
-            + std::wstring(_T(" in WinHttpQueryDataAvailable.\n"));
-         return false;
-      }
+    // Use WinHttpQueryHeaders to obtain the size of the buffer.
+    if (::WinHttpQueryHeaders(
+        hRequest,
+        resHeaders._infoLevel,
+        resHeaders._name,
+        NULL, &hdSize,
+        resHeaders._index))
+    {
+        return false;
+    }
 
-      if (0 == dataSize)
-      {
-         if (_answer.size())
-         {
-            return true;
-         }
+    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    {
+        return false;
+    }
 
-          _errorMessage.assign(_T("No response data\n"));
-          return false;
-      }
+    if (0 == hdSize)
+    {
+        return false;
+    }
 
-      // Allocate space for the buffer
-      try
-      {
-         dataBuffer = new BYTE[dataSize + 1];
-      }
-      catch (std::bad_alloc&)
-      {
-         _errorMessage.assign(_T("Out of memory\n"));
-         return false;
-      }
+    // Allocate memory for the buffer.
+    BYTE* buffer{};
+    try
+    {
+        buffer = new BYTE[hdSize + 1];
+    }
+    catch (std::bad_alloc&)
+    {
+        return false;
+    }
 
-      ZeroMemory(dataBuffer, dataSize + 1);
+    ZeroMemory(buffer, hdSize);
 
-      // Read the data
-      if (!WinHttpReadData(_hRequest, dataBuffer, dataSize, &downloadedData))
-      {
-         _errorMessage = std::wstring(_T("Error ")) 
-            + std::to_wstring(GetLastError()) 
-            + std::wstring(_T(" in WinHttpReadData.\n"));
-         return false;
-      }
+    // Use WinHttpQueryHeaders to retrieve the header.
+    bResult = ::WinHttpQueryHeaders(
+                hRequest,
+                resHeaders._infoLevel,
+                resHeaders._name,
+                buffer, &hdSize,
+                resHeaders._index);
 
-      _answer.append(reinterpret_cast<PCHAR>(dataBuffer));
+    if (bResult)
+    {
+        headers.assign(reinterpret_cast<PTCHAR>(buffer));
+    }
 
-      // Free the memory allocated to the buffer
-      delete[] dataBuffer;
-
-      if (dataSize != downloadedData)
-      {
-         return false;
-      }
-
-   }
-
-   // Convert string to wstring
-   //int wchars_num = MultiByteToWideChar(CP_UTF8, 0, _answer.c_str(), -1, NULL, 0);
-   //wchar_t* wstr = new wchar_t[wchars_num];
-   //wchars_num = MultiByteToWideChar(CP_UTF8, 0, _answer.c_str(), -1, wstr, wchars_num);
-   //std::wstring _data;
-   //_data.assign(wstr);
-   //delete[] wstr;
-
-   //return true;
+    return TRUE == bResult;
 }
 
-bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest)
+bool HttpReadAnswer(const HINTERNET& hRequest, std::string& answer, std::wstring& errorMessage)
 {
-   bool isClosed{};
+    DWORD dataSize{};
+    DWORD downloadedData{};
+    BYTE* dataBuffer{};
 
-   if (_hRequest)
-      isClosed = (TRUE == WinHttpCloseHandle(_hRequest));
+    answer.clear();
+    errorMessage.assign(_T("Succeeded\n"));
 
-   if (_hConnect)
-      isClosed &= (TRUE == WinHttpCloseHandle(_hConnect));
+    while (true)
+    {
+        // Check for data available
+        if (!::WinHttpQueryDataAvailable(hRequest, &dataSize))
+        {
+            errorMessage = std::wstring(_T("Error "))
+                + std::to_wstring(GetLastError())
+                + std::wstring(_T(" in WinHttpQueryDataAvailable.\n"));
+            return false;
+        }
 
-   if (_hSession)
-      isClosed &= (TRUE == WinHttpCloseHandle(_hSession));
+        if (0 == dataSize)
+        {
+            if (answer.size())
+            {
+                return true;
+            }
 
-   return isClosed;
+            errorMessage.assign(_T("No response data\n"));
+            return false;
+        }
+
+        // Allocate space for the buffer
+        try
+        {
+            dataBuffer = new BYTE[dataSize + 1];
+        }
+        catch (std::bad_alloc&)
+        {
+            errorMessage.assign(_T("Out of memory\n"));
+            return false;
+        }
+
+        ZeroMemory(dataBuffer, dataSize + 1);
+
+        // Read the data
+        if (!::WinHttpReadData(hRequest, dataBuffer, dataSize, &downloadedData))
+        {
+            errorMessage = std::wstring(_T("Error "))
+                + std::to_wstring(GetLastError())
+                + std::wstring(_T(" in WinHttpReadData.\n"));
+            return false;
+        }
+
+        answer.append(reinterpret_cast<PCHAR>(dataBuffer));
+
+        // Free the memory allocated to the buffer
+        delete[] dataBuffer;
+
+        if (dataSize != downloadedData)
+        {
+            return false;
+        }
+
+    }
+
+    // Convert string to wstring
+    //int wchars_num = MultiByteToWideChar(CP_UTF8, 0, answer.c_str(), -1, NULL, 0);
+    //wchar_t* wstr = new wchar_t[wchars_num];
+    //wchars_num = MultiByteToWideChar(CP_UTF8, 0, answer.c_str(), -1, wstr, wchars_num);
+    //std::wstring _data;
+    //_data.assign(wstr);
+    //delete[] wstr;
+
+    //return true;
+}
+
+bool HttpCloseSession(HINTERNET& hSession, HINTERNET& hCconnect, HINTERNET& hRequest)
+{
+    bool isClosed{};
+
+    if (hRequest)
+        isClosed = (TRUE == ::WinHttpCloseHandle(hRequest));
+
+    if (hCconnect)
+        isClosed &= (TRUE == ::WinHttpCloseHandle(hCconnect));
+
+    if (hSession)
+        isClosed &= (TRUE == ::WinHttpCloseHandle(hSession));
+
+    return isClosed;
 }
 
 std::string ByteArrayToString(const BYTE bytes[], std::size_t n)
 {
-   std::ostringstream stm;
-   //stm << std::hex << std::uppercase;
+    std::ostringstream stm;
+    //stm << std::hex << std::uppercase;
 
-   for (std::size_t i = 0; i < n; ++i)
-      //stm << std::setw(2) << std::setfill('0') << unsigned(bytes[i]);
-      stm << bytes[i];// << bytes[++i];
+    for (std::size_t i = 0; i < n; ++i)
+        //stm << std::setw(2) << std::setfill('0') << unsigned(bytes[i]);
+        stm << bytes[i];// << bytes[++i];
 
-   return stm.str();
+    return stm.str();
 }
 
 std::string WstringToString(std::wstring wstr)
 {
-   // https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130(v=vs.85).aspx
-   const auto sz = ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
-   std::vector<char> vec(sz);
-   ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), vec.data(), (int)vec.size(), nullptr, nullptr);
-   return { vec.begin(), vec.end() };
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130(v=vs.85).aspx
+    const auto sz = ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
+    std::vector<char> vec(sz);
+    ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), vec.data(), (int)vec.size(), nullptr, nullptr);
+    return { vec.begin(), vec.end() };
 }
 
 std::string BSTRToString(const BSTR bstr)
 {
-   return WstringToString(bstr);
+    return WstringToString(bstr);
 }
 
