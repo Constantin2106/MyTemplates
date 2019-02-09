@@ -2,11 +2,7 @@
 #include <windows.h>
 #include <winhttp.h>
 #include <tchar.h>
-//#include <string>
-#include <sstream>
-//#include <iomanip>
-//#include <vector>
-//#include <memory>
+#include <string>
 
 #pragma comment( lib, "oleaut32.lib" )
 
@@ -44,74 +40,76 @@ enum class OpenRequestFlags : DWORD
 
 struct SessionData
 {
-   std::wstring _agent{ _T("agent") };
+   std::wstring agent{ _T("agent") };
 
-   DWORD _accessType = ACCESS_TYPE(DEF_PROXY);
-   LPCWSTR _proxyName = WINHTTP_NO_PROXY_NAME;
-   LPCWSTR _proxyBypass = WINHTTP_NO_PROXY_BYPASS;
-   DWORD _sessionFlags{};
+   DWORD accessType = ACCESS_TYPE(DEF_PROXY);
+   LPCWSTR proxyName = WINHTTP_NO_PROXY_NAME;
+   LPCWSTR proxyBypass = WINHTTP_NO_PROXY_BYPASS;
+   DWORD sessionFlags{};
 };
 struct ConnectData
 {
-   std::wstring _server;
-   INTERNET_PORT _port = PORT(DEFAULT_PORT);
+   std::wstring server;
+   INTERNET_PORT port = PORT(DEFAULT_PORT);
 };
 struct CreateRequest
 {
-   LPCWSTR _verb = VERB(GET);
-   DWORD _requestFlags = FLAGS(SECURE);
-   std::wstring _objName;
-   LPCWSTR _version{};
-   LPCWSTR _referrer = WINHTTP_NO_REFERER;
-   LPCWSTR* _acceptTypes = WINHTTP_DEFAULT_ACCEPT_TYPES;
+   LPCWSTR verb = VERB(GET);
+   DWORD requestFlags = FLAGS(SECURE);
+   std::wstring objName;
+   LPCWSTR version{};
+   LPCWSTR referrer = WINHTTP_NO_REFERER;
+   LPCWSTR* acceptTypes = WINHTTP_DEFAULT_ACCEPT_TYPES;
 };
 struct RequestHeaders
 {
-   std::wstring _headers{};
-   DWORD _modifiers = WINHTTP_ADDREQ_FLAG_ADD;
+   std::wstring headers{};
+   DWORD modifiers = WINHTTP_ADDREQ_FLAG_ADD;
 };
 struct SendRequest
 {
-   LPCWSTR _headers = WINHTTP_NO_ADDITIONAL_HEADERS;
-   DWORD _headersLength{};
-   LPVOID _optional = WINHTTP_NO_REQUEST_DATA;
-   DWORD _optionalLength{};
-   DWORD _totalLength{};
-   DWORD_PTR _context{};
+   LPCWSTR headers = WINHTTP_NO_ADDITIONAL_HEADERS;
+   DWORD headersLength{};
+   LPVOID optional = WINHTTP_NO_REQUEST_DATA;
+   DWORD optionalLength{};
+   DWORD totalLength{};
+   DWORD_PTR context{};
 };
 struct ResponseHeaders
 {
-   DWORD _infoLevel = WINHTTP_QUERY_RAW_HEADERS_CRLF;
-   LPCWSTR _name = WINHTTP_HEADER_NAME_BY_INDEX;
-   LPDWORD _index = WINHTTP_NO_HEADER_INDEX;
+   DWORD infoLevel = WINHTTP_QUERY_RAW_HEADERS_CRLF;
+   LPCWSTR name = WINHTTP_HEADER_NAME_BY_INDEX;
+   LPDWORD index = WINHTTP_NO_HEADER_INDEX;
 };
 
 struct RequestData
 {
    // Session data
-   SessionData _session;
+   SessionData session;
 
    // Connect data
-   ConnectData _connect;
+   ConnectData connect;
 
    // Create Request data
-   CreateRequest _createReq;
+   CreateRequest createReq;
 
    // Request headers
-   RequestHeaders _reqHeaders;
+   RequestHeaders reqHeaders;
 
    // Send request data
-   SendRequest _sendReq;
+   SendRequest sendReq;
 
    // Read headers data
-   ResponseHeaders _resHeaders;
+   ResponseHeaders resHeaders;
 };
 
 struct RequestResult
 {
    bool success = true;
    DWORD error = WINHTTP_ERROR_BASE;
+   DWORD status{};
+
    std::wstring message;
 };
-#define RETURN_ERROR(result) { result.success = false; result.error = GetLastError(); return result;	}
+#define RETURN_ERROR(result) { result.success = false; result.error = GetLastError(); return result; }
 

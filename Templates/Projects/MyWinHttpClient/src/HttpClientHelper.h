@@ -2,15 +2,17 @@
 
 #include "HttpDataStruct.h"
 
-bool HttpOpenSyncSession(HINTERNET& hSession, const SessionData& session);
+using HttpStatusCallback = void (CALLBACK*)(HINTERNET, DWORD_PTR, DWORD, LPVOID, DWORD);
 
-bool HttpConnectToServer(HINTERNET& hCconnect, const HINTERNET hSession, const ConnectData& connect);
+bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession);
 
-bool HttpCreateRequest(HINTERNET& hRequest, const HINTERNET hCconnect, const CreateRequest& createReq);
+bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect);
+
+bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest);
 
 bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders);
 
-bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, bool checkCertificate = false);
+bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpStatusCallback = nullptr);
 
 bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID _reserved = {});
 

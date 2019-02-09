@@ -1,9 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include "HttpClientHelper.h"
 
-static void CALLBACK HttpClientCallback(
+static void CALLBACK HttpCallback(
                 HINTERNET hInternet,
                 DWORD_PTR context,
                 DWORD status,
@@ -12,9 +13,11 @@ static void CALLBACK HttpClientCallback(
 {
     if (WINHTTP_CALLBACK_FLAG_SECURE_FAILURE == status)
     {
-		std::cout << std::endl << std::endl << "Secure failure" << std::endl;
-		DWORD stInfo = *((DWORD*)statusInfo);
+		*(reinterpret_cast<DWORD*>(context)) = *(static_cast<DWORD*>(statusInfo));
 
+#ifdef _DEBUG
+		std::cout << std::endl << std::endl << "Secure failure" << std::endl;
+		auto stInfo = *(static_cast<DWORD*>(statusInfo));
 		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
 			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
 		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
@@ -29,41 +32,43 @@ static void CALLBACK HttpClientCallback(
 			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
 		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
 			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
+#endif // _DEBUG
     }
 }
+//HttpStatusCallback HttpSendRequestCallback = HttpClientCallback;
 
-bool HttpOpenSyncSession(HINTERNET& hSession, const SessionData& session)
+bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession)
 {
     hSession = ::WinHttpOpen(
-                session._agent.c_str(),
-                session._accessType,
-                session._proxyName,
-                session._proxyBypass,
-                session._sessionFlags);
+                session.agent.c_str(),
+                session.accessType,
+                session.proxyName,
+                session.proxyBypass,
+                session.sessionFlags);
 
     return NULL != hSession;
 }
 
-bool HttpConnectToServer(HINTERNET& hCconnect, const HINTERNET hSession, const ConnectData& connect)
+bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect)
 {
-    hCconnect = ::WinHttpConnect(
+    hConnect = ::WinHttpConnect(
                  hSession,
-                 connect._server.c_str(),
-                 connect._port, 0);
+                 connect.server.c_str(),
+                 connect.port, 0);
 
-    return NULL != hCconnect;
+    return NULL != hConnect;
 }
 
-bool HttpCreateRequest(HINTERNET& hRequest, const HINTERNET hCconnect, const CreateRequest& createReq)
+bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest)
 {
     hRequest = ::WinHttpOpenRequest(
-                hCconnect,
-                createReq._verb,
-                createReq._objName.c_str(),
-                createReq._version,
-                createReq._referrer,
-                createReq._acceptTypes,
-                createReq._requestFlags);
+                hConnect,
+                createReq.verb,
+                createReq.objName.c_str(),
+                createReq.version,
+                createReq.referrer,
+                createReq.acceptTypes,
+                createReq.requestFlags);
 
     return NULL != hRequest;
 }
@@ -72,18 +77,18 @@ bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders)
 {
     return TRUE == ::WinHttpAddRequestHeaders(
                     hRequest,
-                    reqHeaders._headers.c_str(),
+                    reqHeaders.headers.c_str(),
                     ULONG(-1L),
-                    reqHeaders._modifiers);
+                    reqHeaders.modifiers);
 }
 
-bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, bool checkCertificate/* = false*/)
+bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpStatusCallback statusCallback/* = nullptr*/)
 {
-    if (checkCertificate)
+    if (sendReq.context || statusCallback)
     {
-        WINHTTP_STATUS_CALLBACK isCallback = ::WinHttpSetStatusCallback(
+        auto isCallback = ::WinHttpSetStatusCallback(
                             hRequest,
-                            reinterpret_cast<WINHTTP_STATUS_CALLBACK>(HttpClientCallback),
+                            reinterpret_cast<WINHTTP_STATUS_CALLBACK>(HttpCallback),
                             WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
 
         if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
@@ -95,12 +100,12 @@ bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, bool 
 
     return TRUE == ::WinHttpSendRequest(
                     hRequest,
-                    sendReq._headers,
-                    sendReq._headersLength,
-                    sendReq._optional,
-                    sendReq._optionalLength,
-                    sendReq._totalLength,
-                    sendReq._context);
+                    sendReq.headers,
+                    sendReq.headersLength,
+                    sendReq.optional,
+                    sendReq.optionalLength,
+                    sendReq.totalLength,
+                    sendReq.context);
 }
 
 bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
@@ -119,10 +124,10 @@ bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeader
     // Use WinHttpQueryHeaders to obtain the size of the buffer.
     if (::WinHttpQueryHeaders(
         hRequest,
-        resHeaders._infoLevel,
-        resHeaders._name,
+        resHeaders.infoLevel,
+        resHeaders.name,
         NULL, &hdSize,
-        resHeaders._index))
+        resHeaders.index))
     {
         return false;
     }
@@ -153,10 +158,10 @@ bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeader
     // Use WinHttpQueryHeaders to retrieve the header.
     bResult = ::WinHttpQueryHeaders(
                 hRequest,
-                resHeaders._infoLevel,
-                resHeaders._name,
+                resHeaders.infoLevel,
+                resHeaders.name,
                 buffer, &hdSize,
-                resHeaders._index);
+                resHeaders.index);
 
     if (bResult)
     {

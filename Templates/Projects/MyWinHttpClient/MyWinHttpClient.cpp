@@ -5,7 +5,13 @@
 #include <conio.h>
 #include <iostream>
 
+#include <sstream>
 #include "src\HttpClient.h"
+
+#define Exit(message)					\
+	std::cout << message << std::endl;	\
+	_getch();							\
+	return{}
 
 int main()
 {
@@ -31,18 +37,16 @@ int main()
     HttpClient client;
     RequestData rqData;
 
-    rqData._connect._server.assign(_T("www.kmp.ua"));
-    rqData._createReq._verb = VERB(GET);
-    rqData._createReq._requestFlags = FLAGS(UNSECURE);
-    rqData._createReq._objName.assign(_T("/wp-json/wp/v2/users/1"));
+    rqData.connect.server.assign(_T("www.kmp.ua"));
+    rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));
     //rqData._reqHeaders._headers = ;
 
     client.SetParam(std::move(rqData));
-    client.SyncRequest();
+    auto res = client.SyncRequest();
 
     if(client.IsHeadersEmpty())
     {
-        return {};
+		Exit("Headers empty");
     }
     std::wstring wstr;
     std::wistringstream wheaders = client.GetHeadersAsStrings();
@@ -55,7 +59,7 @@ int main()
 
     if(client.IsAnswerEmpty())
     {
-        return {};
+		Exit("Answer empty");
     }
     std::string str;
     std::istringstream answers = client.GetAnswerAsStrings();
