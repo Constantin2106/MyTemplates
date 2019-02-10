@@ -10,7 +10,7 @@ public:
    ~HttpClient();
 
    void SetParam(RequestData&& _rqData);
-   bool SyncRequest();
+   RequestResult SyncRequest();
 
    bool IsHeadersEmpty();
    std::wstring GetHeaders();

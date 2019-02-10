@@ -10,7 +10,6 @@ class HttpClient::Impl
 {
 	RequestData m_request;
 
-	DWORD m_error;
 	std::wstring m_headers;
 	std::string m_answer;
 
@@ -44,11 +43,22 @@ public:
 			RETURN_ERROR(result);
 		}
 
-		m_error = 0;
-		m_request.sendReq.context = (DWORD_PTR)(&m_error);
+		result.status = 0;
+		m_request.sendReq.context = (DWORD_PTR)(&result.status);
 		if (!HttpSendRequest(hRequest, m_request.sendReq))
 		{
-			result.status = m_error;
+			if (result.status)
+			{
+				LPTSTR buffer{};
+				auto hModule = LoadLibrary(_T("wininet.dll"));
+				if (hModule)
+				{
+					FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE, hModule, 12045, 0, (LPTSTR)&buffer, 0, NULL);
+					FreeLibrary(hModule);
+					if(buffer)
+						result.message.assign(buffer);
+				}
+			}
 			RETURN_ERROR(result);
 		}
 
@@ -96,15 +106,9 @@ void HttpClient::SetParam(RequestData&& _rqData)
 	m_pImpl->SetParam(std::move(_rqData));
 }
 
-bool HttpClient::SyncRequest()
+RequestResult HttpClient::SyncRequest()
 {
-	auto res = m_pImpl->syncRequest();
-	if (!res.success)
-	{
-
-	}
-
-	return res.success;
+	return m_pImpl->syncRequest();
 }
 
 bool HttpClient::IsHeadersEmpty()

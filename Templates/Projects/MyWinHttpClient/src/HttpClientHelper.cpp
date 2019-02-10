@@ -84,13 +84,23 @@ bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders)
 
 bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpStatusCallback statusCallback/* = nullptr*/)
 {
-    if (sendReq.context || statusCallback)
+    if (sendReq.context)
     {
-        auto isCallback = ::WinHttpSetStatusCallback(
-                            hRequest,
-                            reinterpret_cast<WINHTTP_STATUS_CALLBACK>(HttpCallback),
-                            WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
-
+		WINHTTP_STATUS_CALLBACK isCallback;
+		if (statusCallback)
+		{
+			isCallback = ::WinHttpSetStatusCallback(
+							hRequest,
+							reinterpret_cast<WINHTTP_STATUS_CALLBACK>(statusCallback),
+							WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
+		}
+		else
+		{
+			isCallback = ::WinHttpSetStatusCallback(
+							hRequest,
+							reinterpret_cast<WINHTTP_STATUS_CALLBACK>(HttpCallback),
+							WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
+		}
         if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
         {
             auto err = GetLastError();
@@ -288,4 +298,23 @@ std::string BSTRToString(const BSTR bstr)
 {
     return WstringToString(bstr);
 }
+
+#include <codecvt>
+#include <clocale>
+std::string Wstr2Str(const std::wstring& wstr)
+{
+	std::setlocale(LC_ALL, "");
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
+}
+std::wstring Str2Wstr(const std::string& str)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.from_bytes(str);
+}
+
 

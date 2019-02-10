@@ -44,3 +44,7 @@ std::string ByteArrayToString(const BYTE(&byte_array)[N])
 std::string BSTRToString(const BSTR bstr);
 std::string WstringToString(std::wstring wstr);
 
+// Convert wstring to string
+std::string Wstr2Str(const std::wstring& wstr);
+std::wstring Str2Wstr(const std::string& str);
+

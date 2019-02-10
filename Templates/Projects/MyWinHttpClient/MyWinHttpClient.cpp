@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include "src\HttpClient.h"
+#include "src\HttpClientHelper.h"
 
 #define Exit(message)					\
 	std::cout << message << std::endl;	\
@@ -19,18 +20,22 @@ int main()
     //auto s = getSize(x);
 
     //--------------------------------------------------------//
-    //const BYTE bytes[] = { 72, 101, 108, 108, 111 };
-    //std::string strBytes = ByteArrayToString(bytes);
-    //std::cout << strBytes << std::endl;
+    /*const BYTE bytes[] = { 72, 101, 108, 108, 111 };
+    std::string strBytes = ByteArrayToString(bytes);
+    std::cout << strBytes << std::endl;
 
-    //const BSTR bstr = ::SysAllocString(L"Hello world");
-    //std::string strn = BSTRToString(bstr);
-    //std::cout << strn << std::endl;
-    //::SysFreeString(bstr);
+    const BSTR bstr = ::SysAllocString(L"Hello world");
+    std::string strn = BSTRToString(bstr);
+    std::cout << strn << std::endl;
+    ::SysFreeString(bstr);
 
-    //const std::wstring widestr(L"Hello again");
-    //std::string charstr = WstringToString(widestr);
-    //std::cout << charstr << std::endl;
+    const std::wstring widestr(L"Hello again");
+    std::string charstr = WstringToString(widestr);
+    std::cout << charstr << std::endl;*/
+
+	/*std::wstring widestr(L"ÉÖÓÊÅÍ");
+	std::string strng = Wstr2Str(widestr);
+	std::cout << strng << std::endl;*/
     //--------------------------------------------------------//
 
 
@@ -43,6 +48,13 @@ int main()
 
     client.SetParam(std::move(rqData));
     auto res = client.SyncRequest();
+	if (!res.success)
+	{
+		std::wcout << res.message.c_str() << std::endl;
+		std::string msg = WstringToString(res.message);
+		std::cout << std::endl << msg.c_str() << std::endl;
+		Exit(res.message.c_str());
+	}
 
     if(client.IsHeadersEmpty())
     {
