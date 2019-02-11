@@ -4,6 +4,7 @@
 
 #include <conio.h>
 #include <iostream>
+#include <locale>
 
 #include <sstream>
 #include "src\HttpClient.h"
@@ -50,6 +51,7 @@ int main()
     auto res = client.SyncRequest();
 	if (!res.success)
 	{
+		std::wcout.imbue(std::locale("rus_rus.866"));
 		std::wcout << res.message.c_str() << std::endl;
 		//std::string msg = WstringToString(res.message);
 		//const int size = res.message.size();
@@ -58,7 +60,7 @@ int main()
 		wcstombs(buff, res.message.c_str(), size);
 		std::string msg(buff);
 		std::cout << std::endl << buff << std::endl;
-		//delete[] buff;
+		delete[] buff;
 		Exit("");
 	}
 
