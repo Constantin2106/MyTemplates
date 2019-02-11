@@ -51,9 +51,15 @@ int main()
 	if (!res.success)
 	{
 		std::wcout << res.message.c_str() << std::endl;
-		std::string msg = WstringToString(res.message);
-		std::cout << std::endl << msg.c_str() << std::endl;
-		Exit(res.message.c_str());
+		//std::string msg = WstringToString(res.message);
+		//const int size = res.message.size();
+		size_t size = res.message.length();
+		char* buff = new char[size];
+		wcstombs(buff, res.message.c_str(), size);
+		std::string msg(buff);
+		std::cout << std::endl << buff << std::endl;
+		//delete[] buff;
+		Exit("");
 	}
 
     if(client.IsHeadersEmpty())
