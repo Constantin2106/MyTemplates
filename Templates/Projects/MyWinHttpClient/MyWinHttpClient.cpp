@@ -4,7 +4,6 @@
 
 #include <conio.h>
 #include <iostream>
-#include <locale>
 
 #include <sstream>
 #include "src\HttpClient.h"
@@ -37,6 +36,11 @@ int main()
 	/*std::wstring widestr(L"…÷” ≈Õ");
 	std::string strng = Wstr2Str(widestr);
 	std::cout << strng << std::endl;*/
+	/*std::wstring wmsg(L"QWERTY");
+	size_t size = wmsg.size() + 1;
+	std::string msg(size, {});
+	size_t n = wcstombs(&msg[0], wmsg.c_str(), size);
+	std::cout << msg << std::endl;*/
     //--------------------------------------------------------//
 
 
@@ -51,16 +55,7 @@ int main()
     auto res = client.SyncRequest();
 	if (!res.success)
 	{
-		std::wcout.imbue(std::locale("rus_rus.866"));
 		std::wcout << res.message.c_str() << std::endl;
-		//std::string msg = WstringToString(res.message);
-		//const int size = res.message.size();
-		size_t size = res.message.length();
-		char* buff = new char[size];
-		wcstombs(buff, res.message.c_str(), size);
-		std::string msg(buff);
-		std::cout << std::endl << buff << std::endl;
-		delete[] buff;
 		Exit("");
 	}
 

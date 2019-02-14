@@ -111,5 +111,6 @@ struct RequestResult
 
    std::wstring message;
 };
-#define RETURN_ERROR(result) { result.success = false; result.error = GetLastError(); return result; }
-
+#define REQUEST_SUCCEEDED(resError) (resError <= WINHTTP_ERROR_BASE)
+#define REQUEST_FAILED(resError) (resError > WINHTTP_ERROR_BASE)
+#define RETURN_ERROR(result) { result.success = false; result.error = ::GetLastError(); return result; }

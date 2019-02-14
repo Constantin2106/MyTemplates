@@ -44,22 +44,43 @@ public:
 		}
 
 		result.status = 0;
-		m_request.sendReq.context = (DWORD_PTR)(&result.status);
+		m_request.sendReq.context = (DWORD_PTR)(&result);
+		
 		if (!HttpSendRequest(hRequest, m_request.sendReq))
 		{
 			if (result.status)
 			{
-				LPTSTR buffer{};
-				auto hModule = LoadLibrary(_T("wininet.dll"));
+				// The result contains additional information (status)
+				// Receive the system message
+				LPWSTR buffer{};
+				HMODULE hModule{};
+				
+				if (IS_SECURE_FAILURE(result.status))
+				{
+					hModule = LoadLibrary(_T("wininet.dll"));
+				}
+				/*else if ()
+				{
+					// TODO: Load appropriate lib
+				}*/
 				if (hModule)
 				{
-					FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE, hModule, 12045, 0, (LPTSTR)&buffer, 0, NULL);
+					auto nTCHARs = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE, 
+													hModule, 
+													result.status,
+													MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
+													(LPWSTR)&buffer, 
+													0, 
+													NULL);
 					FreeLibrary(hModule);
-					if(buffer)
-						result.message.assign(buffer);
+					if (nTCHARs)
+					{
+						result.message.assign(_T("Error code: ") + std::to_wstring(result.status) + _T('\t'));
+						result.message.append(buffer, nTCHARs - 2); // -2 to remove \r\n symbols
+					}
 				}
 			}
-			RETURN_ERROR(result);
+			return result;
 		}
 
 		if (!HttpWaitAnswer(hRequest))

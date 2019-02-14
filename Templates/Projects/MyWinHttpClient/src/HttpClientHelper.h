@@ -24,6 +24,17 @@ bool HttpReadAnswer(const HINTERNET& hRequest, std::string& _answer, std::wstrin
 
 bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest);
 
+
+#define IS_SECURE_FAILURE(err) (							\
+		(err == ERROR_WINHTTP_SECURE_CERT_REV_FAILED)	||	\
+		(err == ERROR_WINHTTP_SECURE_INVALID_CERT)		||	\
+		(err == ERROR_WINHTTP_SECURE_CERT_REVOKED)		||	\
+		(err == ERROR_WINHTTP_SECURE_INVALID_CA)		||	\
+		(err == ERROR_WINHTTP_SECURE_CERT_CN_INVALID)	||	\
+		(err == ERROR_WINHTTP_SECURE_CERT_DATE_INVALID)	||	\
+		(err == ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE)	||	\
+		(err == ERROR_WINHTTP_SECURE_CHANNEL_ERROR))
+
 // Get size of array
 template <typename T, std::size_t N>
 std::size_t getSize(T(&)[N])

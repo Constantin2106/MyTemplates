@@ -1,8 +1,21 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <array>
 
 #include "HttpClientHelper.h"
+
+
+static const std::array<std::pair<DWORD, DWORD>, 8> statusToError({
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED,			ERROR_WINHTTP_SECURE_CERT_REV_FAILED),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT,				ERROR_WINHTTP_SECURE_INVALID_CERT),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED,				ERROR_WINHTTP_SECURE_CERT_REVOKED),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA,				ERROR_WINHTTP_SECURE_INVALID_CA),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID,			ERROR_WINHTTP_SECURE_CERT_CN_INVALID),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID,		ERROR_WINHTTP_SECURE_CERT_DATE_INVALID),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_WRONG_USAGE,			ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE),
+	std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR,	ERROR_WINHTTP_SECURE_CHANNEL_ERROR)
+});
 
 static void CALLBACK HttpCallback(
                 HINTERNET hInternet,
@@ -13,8 +26,6 @@ static void CALLBACK HttpCallback(
 {
     if (WINHTTP_CALLBACK_FLAG_SECURE_FAILURE == status)
     {
-		*(reinterpret_cast<DWORD*>(context)) = *(static_cast<DWORD*>(statusInfo));
-
 #ifdef _DEBUG
 		std::cout << std::endl << std::endl << "Secure failure" << std::endl;
 		auto stInfo = *(static_cast<DWORD*>(statusInfo));
@@ -33,6 +44,18 @@ static void CALLBACK HttpCallback(
 		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
 			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
 #endif // _DEBUG
+
+		auto stat = *(static_cast<DWORD*>(statusInfo));
+
+		auto reqReslt = reinterpret_cast<RequestResult*>(context);
+		reqReslt->success = false;
+
+		for(auto& element : statusToError)
+		{
+			reqReslt->status = stat & element.first ? element.second : 0;
+			if (reqReslt->status)
+				break;
+		}
     }
 }
 //HttpStatusCallback HttpSendRequestCallback = HttpClientCallback;
@@ -103,19 +126,31 @@ bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpS
 		}
         if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
         {
-            auto err = GetLastError();
-
+			auto reqResult = reinterpret_cast<RequestResult*>(sendReq.context);
+			reqResult->success = false;
+			reqResult->error = ::GetLastError();
+			return false;
         }
     }
 
-    return TRUE == ::WinHttpSendRequest(
-                    hRequest,
-                    sendReq.headers,
-                    sendReq.headersLength,
-                    sendReq.optional,
-                    sendReq.optionalLength,
-                    sendReq.totalLength,
-                    sendReq.context);
+	auto isSucceeded = TRUE == ::WinHttpSendRequest(
+									hRequest,
+									sendReq.headers,
+									sendReq.headersLength,
+									sendReq.optional,
+									sendReq.optionalLength,
+									sendReq.totalLength,
+									sendReq.context);
+	if (sendReq.context)
+	{
+		// TODO: Here need check if sendReq.context has RequestResult type
+		// Because any variable can be passed here.
+		auto reqResult = reinterpret_cast<RequestResult*>(sendReq.context);
+		reqResult->success = isSucceeded;
+		reqResult->error = ::GetLastError();
+	}
+
+	return isSucceeded;
 }
 
 bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
