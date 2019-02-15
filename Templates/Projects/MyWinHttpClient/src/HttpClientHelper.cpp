@@ -26,6 +26,7 @@ static void CALLBACK HttpCallback(
 {
     if (WINHTTP_CALLBACK_FLAG_SECURE_FAILURE == status)
     {
+#pragma region  Temporary Console Log
 #ifdef _DEBUG
 		std::cout << std::endl << std::endl << "Secure failure" << std::endl;
 		auto stInfo = *(static_cast<DWORD*>(statusInfo));
@@ -44,16 +45,19 @@ static void CALLBACK HttpCallback(
 		if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
 			std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
 #endif // _DEBUG
+#pragma endregion
+
+		auto reqResult = reinterpret_cast<RequestResult*>(context);
+		if (!reqResult)
+			return;
 
 		auto stat = *(static_cast<DWORD*>(statusInfo));
-
-		auto reqReslt = reinterpret_cast<RequestResult*>(context);
-		reqReslt->success = false;
+		reqResult->success = false;
 
 		for(auto& element : statusToError)
 		{
-			reqReslt->status = stat & element.first ? element.second : 0;
-			if (reqReslt->status)
+			reqResult->status = stat & element.first ? element.second : 0;
+			if (reqResult->status)
 				break;
 		}
     }
@@ -107,7 +111,9 @@ bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders)
 
 bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpStatusCallback statusCallback/* = nullptr*/)
 {
-    if (sendReq.context)
+	auto reqResult = reinterpret_cast<RequestResult*>(sendReq.context);
+
+    if (reqResult)
     {
 		WINHTTP_STATUS_CALLBACK isCallback;
 		if (statusCallback)
@@ -126,7 +132,6 @@ bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpS
 		}
         if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
         {
-			auto reqResult = reinterpret_cast<RequestResult*>(sendReq.context);
 			reqResult->success = false;
 			reqResult->error = ::GetLastError();
 			return false;
@@ -141,11 +146,10 @@ bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpS
 									sendReq.optionalLength,
 									sendReq.totalLength,
 									sendReq.context);
-	if (sendReq.context)
+	if (reqResult)
 	{
 		// TODO: Here need check if sendReq.context has RequestResult type
 		// Because any variable can be passed here.
-		auto reqResult = reinterpret_cast<RequestResult*>(sendReq.context);
 		reqResult->success = isSucceeded;
 		reqResult->error = ::GetLastError();
 	}
