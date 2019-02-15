@@ -3,28 +3,31 @@
 #include <memory>
 #include "HttpDataStruct.h"
 
-class HttpClient
+namespace http
 {
-public:
-   HttpClient();
-   ~HttpClient();
+	class HttpClient
+	{
+	public:
+		HttpClient();
+		~HttpClient();
 
-   void SetParam(RequestData&& _rqData);
-   RequestResult SyncRequest();
+		void SetParam(RequestData&& _rqData);
+		RequestResult SyncRequest();
 
-   bool IsHeadersEmpty();
-   std::wstring GetHeaders();
-   std::wistringstream GetHeadersAsStrings();
+		bool IsHeadersEmpty();
+		std::wstring GetHeaders();
+		std::wistringstream GetHeadersAsStrings();
 
-   bool IsAnswerEmpty();
-   std::string GetAnswer();
-   std::istringstream GetAnswerAsStrings();
+		bool IsAnswerEmpty();
+		std::string GetAnswer();
+		std::istringstream GetAnswerAsStrings();
 
-private:
-   RequestResult m_result;
+	private:
+		RequestResult m_result;
 
-   class Impl;
-   std::unique_ptr<Impl> m_pImpl;
+		class Impl;
+		std::unique_ptr<Impl> m_pImpl;
 
-};
+	};
+}
 

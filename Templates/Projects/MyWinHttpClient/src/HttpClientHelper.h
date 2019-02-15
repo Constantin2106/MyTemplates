@@ -2,27 +2,29 @@
 
 #include "HttpDataStruct.h"
 
-using HttpStatusCallback = void (CALLBACK*)(HINTERNET, DWORD_PTR, DWORD, LPVOID, DWORD);
+namespace http
+{
+	using HttpCallback = void (CALLBACK*)(HINTERNET, DWORD_PTR, DWORD, LPVOID, DWORD);
 
-bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession);
+	bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession);
 
-bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect);
+	bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect);
 
-bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest);
+	bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest);
 
-bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders);
+	bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders);
 
-bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpStatusCallback = nullptr);
+	bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpCallback callback = nullptr);
 
-bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID _reserved = {});
+	bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID _reserved = {});
 
-bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& _headers);
+	bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& _headers);
 
-bool HttpDataAvailable(HINTERNET _hRequest);
+	bool HttpDataAvailable(HINTERNET _hRequest);
 
-bool HttpReadAnswer(const HINTERNET& hRequest, std::string& _answer, std::wstring& _errorMessage);
+	bool HttpReadAnswer(const HINTERNET& hRequest, std::string& _answer, std::wstring& _errorMessage);
 
-bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest);
+	bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest);
 
 
 #define IS_SECURE_FAILURE(err) (							\
@@ -34,6 +36,7 @@ bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hR
 		(err == ERROR_WINHTTP_SECURE_CERT_DATE_INVALID)	||	\
 		(err == ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE)	||	\
 		(err == ERROR_WINHTTP_SECURE_CHANNEL_ERROR))
+}
 
 // Get size of array
 template <typename T, std::size_t N>

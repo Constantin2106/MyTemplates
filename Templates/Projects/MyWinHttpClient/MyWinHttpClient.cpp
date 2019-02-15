@@ -43,6 +43,7 @@ int main()
 	std::cout << msg << std::endl;*/
     //--------------------------------------------------------//
 
+	using namespace http;
 
     HttpClient client;
     RequestData rqData;
