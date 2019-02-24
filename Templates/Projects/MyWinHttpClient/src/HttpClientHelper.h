@@ -62,3 +62,4 @@ std::string WstringToString(std::wstring wstr);
 std::string Wstr2Str(const std::wstring& wstr);
 std::wstring Str2Wstr(const std::string& str);
 
+//std::wstring Utf8ToUtf16(const std::string& str);

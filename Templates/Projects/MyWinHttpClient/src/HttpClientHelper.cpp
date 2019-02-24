@@ -117,12 +117,12 @@ namespace http
 		{
 			HttpCallback statusCallback = callback ? callback : HttpSendRequestCallback;
 
-			auto isCallback = ::WinHttpSetStatusCallback(
-				hRequest,
-				reinterpret_cast<WINHTTP_STATUS_CALLBACK>(statusCallback),
-				WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
+			auto callbackSet = ::WinHttpSetStatusCallback(
+									hRequest,
+									reinterpret_cast<WINHTTP_STATUS_CALLBACK>(statusCallback),
+									WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
 
-			if (WINHTTP_INVALID_STATUS_CALLBACK == isCallback)
+			if (WINHTTP_INVALID_STATUS_CALLBACK == callbackSet)
 			{
 				reqResult->success = false;
 				reqResult->error = ::GetLastError();
@@ -130,23 +130,23 @@ namespace http
 			}
 		}
 
-		auto isSucceeded = TRUE == ::WinHttpSendRequest(
-			hRequest,
-			sendReq.headers,
-			sendReq.headersLength,
-			sendReq.optional,
-			sendReq.optionalLength,
-			sendReq.totalLength,
-			sendReq.context);
+		auto succeeded = TRUE == ::WinHttpSendRequest(
+									hRequest,
+									sendReq.headers,
+									sendReq.headersLength,
+									sendReq.optional,
+									sendReq.optionalLength,
+									sendReq.totalLength,
+									sendReq.context);
 		if (reqResult)
 		{
 			// TODO: Here need check if sendReq.context has RequestResult type
 			// Because any variable can be passed here.
-			reqResult->success = isSucceeded;
+			reqResult->success = succeeded;
 			reqResult->error = ::GetLastError();
 		}
 
-		return isSucceeded;
+		return succeeded;
 	}
 
 	bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
@@ -164,11 +164,11 @@ namespace http
 
 		// Use WinHttpQueryHeaders to obtain the size of the buffer.
 		if (::WinHttpQueryHeaders(
-			hRequest,
-			resHeaders.infoLevel,
-			resHeaders.name,
-			NULL, &hdSize,
-			resHeaders.index))
+				hRequest,
+				resHeaders.infoLevel,
+				resHeaders.name,
+				NULL, &hdSize,
+				resHeaders.index))
 		{
 			return false;
 		}
@@ -198,16 +198,18 @@ namespace http
 
 		// Use WinHttpQueryHeaders to retrieve the header.
 		bResult = ::WinHttpQueryHeaders(
-			hRequest,
-			resHeaders.infoLevel,
-			resHeaders.name,
-			buffer, &hdSize,
-			resHeaders.index);
+					hRequest,
+					resHeaders.infoLevel,
+					resHeaders.name,
+					buffer, &hdSize,
+					resHeaders.index);
 
 		if (bResult)
 		{
 			headers.assign(reinterpret_cast<PTCHAR>(buffer));
 		}
+
+		delete[] buffer;
 
 		return TRUE == bResult;
 	}
@@ -348,5 +350,12 @@ std::wstring Str2Wstr(const std::string& str)
 
 	return converterX.from_bytes(str);
 }
+
+//std::wstring Utf8ToUtf16(const std::string& str)
+//{
+//	std::wstring_convert<std::codecvt_utf16<wchar_t>> converter;
+//	std::wstring wstr = converter.from_bytes(str);
+//	return wstr;
+//}
 
 

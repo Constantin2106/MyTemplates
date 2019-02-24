@@ -50,6 +50,8 @@ int main()
 
     rqData.connect.server.assign(_T("www.kmp.ua"));
     rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));
+	//rqData.createReq.objName.assign(_T("wp-json/wp/v2/posts")); 
+	rqData.createReq.requestFlags = FLAGS(UNSECURE);
     //rqData._reqHeaders._headers = ;
 
     client.SetParam(std::move(rqData));
@@ -77,7 +79,9 @@ int main()
     {
 		Exit("Answer empty");
     }
-    std::string str;
+
+	//setlocale(LC_ALL, "rus");
+	std::string str;
     std::istringstream answers = client.GetAnswerAsStrings();
     printf("-------------- Response contents --------------\n");
     while(std::getline(answers, str, '\n'))

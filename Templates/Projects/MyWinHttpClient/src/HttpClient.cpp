@@ -19,13 +19,15 @@ namespace http
 		void SetParam(RequestData&& _rqData)
 		{
 			m_request = std::move(_rqData);
-			m_request.connect.port = m_request.createReq.requestFlags & FLAGS(SECURE)
-				? PORT(HTTPS_PORT) : PORT(HTTP_PORT);
+			m_request.connect.port = m_request.createReq.requestFlags & FLAGS(SECURE) ? 
+										PORT(HTTPS_PORT) : PORT(HTTP_PORT);
 		}
 
 		RequestResult syncRequest()
 		{
 			RequestResult result;
+
+			auto secureConnection = !!(m_request.createReq.requestFlags & FLAGS(SECURE));
 
 			HINTERNET hSession{};
 			if (!HttpOpenSyncSession(m_request.session, hSession))
@@ -45,9 +47,11 @@ namespace http
 				RETURN_ERROR(result);
 			}
 
-			result.status = 0;
-			m_request.sendReq.context = (DWORD_PTR)(&result);
-
+			if (secureConnection)
+			{
+				result.status = 0;
+				m_request.sendReq.context = (DWORD_PTR)(&result);
+			}
 			if (!HttpSendRequest(hRequest, m_request.sendReq))
 			{
 				if (result.status)
@@ -68,12 +72,12 @@ namespace http
 					if (hModule)
 					{
 						auto nTCHARs = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE,
-							hModule,
-							result.status,
-							MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-							(LPWSTR)&buffer,
-							0,
-							NULL);
+										hModule,
+										result.status,
+										MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+										(LPWSTR)&buffer,
+										0,
+										NULL);
 						FreeLibrary(hModule);
 						if (nTCHARs)
 						{
