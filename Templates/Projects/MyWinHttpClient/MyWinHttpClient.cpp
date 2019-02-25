@@ -48,6 +48,7 @@ int main()
     HttpClient client;
     RequestData rqData;
 
+	//rqData.connect.server.assign(_T("www.microsoft.com"));
     rqData.connect.server.assign(_T("www.kmp.ua"));
     rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));
 	//rqData.createReq.objName.assign(_T("wp-json/wp/v2/posts")); 
@@ -84,7 +85,7 @@ int main()
 	std::string str;
     std::istringstream answers = client.GetAnswerAsStrings();
     printf("-------------- Response contents --------------\n");
-    while(std::getline(answers, str, '\n'))
+    while(std::getline(answers, str, ','))
     {
         std::cout << str << std::endl;
     }

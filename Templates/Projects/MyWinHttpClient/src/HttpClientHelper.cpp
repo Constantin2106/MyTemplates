@@ -184,32 +184,20 @@ namespace http
 		}
 
 		// Allocate memory for the buffer.
-		BYTE* buffer{};
-		try
-		{
-			buffer = new BYTE[hdSize + 1];
-		}
-		catch (std::bad_alloc&)
-		{
-			return false;
-		}
-
-		ZeroMemory(buffer, hdSize);
-
+		std::vector<BYTE> buffer(hdSize, '\0');
+		
 		// Use WinHttpQueryHeaders to retrieve the header.
 		bResult = ::WinHttpQueryHeaders(
 					hRequest,
 					resHeaders.infoLevel,
 					resHeaders.name,
-					buffer, &hdSize,
+					&buffer[0], &hdSize,
 					resHeaders.index);
 
 		if (bResult)
 		{
-			headers.assign(reinterpret_cast<PTCHAR>(buffer));
+			headers.assign(reinterpret_cast<PTCHAR>(buffer.data()));
 		}
-
-		delete[] buffer;
 
 		return TRUE == bResult;
 	}
@@ -218,7 +206,7 @@ namespace http
 	{
 		DWORD dataSize{};
 		DWORD downloadedData{};
-		BYTE* dataBuffer{};
+		std::vector<BYTE> content{};
 
 		answer.clear();
 		errorMessage.assign(_T("Succeeded\n"));
@@ -246,20 +234,11 @@ namespace http
 			}
 
 			// Allocate space for the buffer
-			try
-			{
-				dataBuffer = new BYTE[dataSize + 1];
-			}
-			catch (std::bad_alloc&)
-			{
-				errorMessage.assign(_T("Out of memory\n"));
-				return false;
-			}
+			content.resize(dataSize + 1, '\0');
 
-			ZeroMemory(dataBuffer, dataSize + 1);
-
-			// Read the data
-			if (!::WinHttpReadData(hRequest, dataBuffer, dataSize, &downloadedData))
+			// Read the data										IN ASYNCHRONOUSLY MODE MUST BE NULL
+			//														https://docs.microsoft.com/en-us/windows/desktop/api/winhttp/nf-winhttp-winhttpreaddata	
+			if (!::WinHttpReadData(hRequest, &content[0], dataSize, &downloadedData))
 			{
 				errorMessage = std::wstring(_T("Error "))
 					+ std::to_wstring(GetLastError())
@@ -267,10 +246,7 @@ namespace http
 				return false;
 			}
 
-			answer.append(reinterpret_cast<PCHAR>(dataBuffer));
-
-			// Free the memory allocated to the buffer
-			delete[] dataBuffer;
+			answer.append(reinterpret_cast<PCHAR>(content.data()));
 
 			if (dataSize != downloadedData)
 			{
@@ -287,7 +263,7 @@ namespace http
 		//_data.assign(wstr);
 		//delete[] wstr;
 
-		//return true;
+		return false;
 	}
 
 	bool HttpCloseSession(HINTERNET& hSession, HINTERNET& hCconnect, HINTERNET& hRequest)
