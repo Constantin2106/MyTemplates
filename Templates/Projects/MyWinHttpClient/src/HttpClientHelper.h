@@ -57,6 +57,8 @@ std::string ByteArrayToString(const BYTE(&byte_array)[N])
 // Convert BSTR to string of char
 std::string BSTRToString(const BSTR bstr);
 std::string WstringToString(std::wstring wstr);
+std::string utf8_encode(const std::wstring &wstr);
+std::wstring utf8_decode(const std::string &str);
 
 // Convert wstring to string
 std::string Wstr2Str(const std::wstring& wstr);
