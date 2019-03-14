@@ -234,7 +234,7 @@ namespace http
 			}
 
 			// Allocate space for the buffer
-			content.resize(dataSize + 1, '\0');
+			content.resize(dataSize, '\0');
 
 			// Read the data										IN ASYNCHRONOUSLY MODE MUST BE NULL
 			//														https://docs.microsoft.com/en-us/windows/desktop/api/winhttp/nf-winhttp-winhttpreaddata	
@@ -246,12 +246,14 @@ namespace http
 				return false;
 			}
 
-			answer.append(reinterpret_cast<PCHAR>(content.data()));
 
+			
+			answer.append(reinterpret_cast<PCHAR>(content.data()), reinterpret_cast<PCHAR>(content.data()) + downloadedData);
 			if (dataSize != downloadedData)
 			{
 				return false;
 			}
+			
 
 		}
 
