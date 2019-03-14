@@ -4,6 +4,7 @@
 
 #include <conio.h>
 #include <iostream>
+#include <fstream>
 
 #include <sstream>
 #include "src\HttpClient.h"
@@ -49,6 +50,8 @@ int main()
     RequestData rqData;
 
 	//rqData.connect.server.assign(_T("www.microsoft.com"));
+	/*rqData.connect.server.assign(_T("www.price.moyo.ua"));
+	rqData.createReq.objName.assign(_T("/outofstock.xml"));*/
     rqData.connect.server.assign(_T("www.kmp.ua"));
     rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));
 	//rqData.createReq.objName.assign(_T("wp-json/wp/v2/posts")); 
@@ -59,7 +62,7 @@ int main()
     auto res = client.SyncRequest();
 	if (!res.success)
 	{
-		std::wcout << res.message.c_str() << std::endl;
+		std::wcout << std::endl << res.message.c_str() << std::endl;
 		Exit("");
 	}
 
@@ -81,7 +84,7 @@ int main()
 		Exit("Answer empty");
     }
 
-	//setlocale(LC_ALL, "rus");
+	setlocale(LC_ALL, "rus");
 	std::string str;
     std::istringstream answers = client.GetAnswerAsStrings();
     printf("-------------- Response contents --------------\n");
@@ -89,6 +92,15 @@ int main()
     {
         std::cout << str << std::endl;
     }
+
+	std::istringstream content = client.GetAnswerAsStrings();
+	std::ofstream fout("Content.txt");
+	while (std::getline(content, str, ','))
+	{
+		fout << str << std::endl;
+	}
+
+	fout.close();
 
     _getch();
 

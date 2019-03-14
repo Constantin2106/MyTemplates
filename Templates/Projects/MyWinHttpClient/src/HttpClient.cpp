@@ -49,44 +49,12 @@ namespace http
 
 			if (secureConnection)
 			{
-				result.status = 0;
 				m_request.sendReq.context = (DWORD_PTR)(&result);
 			}
+
 			if (!HttpSendRequest(hRequest, m_request.sendReq))
 			{
-				if (result.status)
-				{
-					// The result contains additional information (status)
-					// Receive the system message
-					LPWSTR buffer{};
-					HMODULE hModule{};
-
-					if (IS_SECURE_FAILURE(result.status))
-					{
-						hModule = LoadLibrary(_T("wininet.dll"));
-					}
-					/*else if ()
-					{
-						// TODO: Load appropriate lib
-					}*/
-					if (hModule)
-					{
-						auto nTCHARs = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE,
-										hModule,
-										result.status,
-										MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-										(LPWSTR)&buffer,
-										0,
-										NULL);
-						FreeLibrary(hModule);
-						if (nTCHARs)
-						{
-							result.message.assign(_T("Error code: ") + std::to_wstring(result.status) + _T('\t'));
-							result.message.append(buffer, nTCHARs - 2); // -2 to remove \r\n symbols
-						}
-					}
-				}
-				return result;
+				RETURN_ERROR(result);
 			}
 
 			if (!HttpWaitAnswer(hRequest))

@@ -108,12 +108,11 @@ namespace http
 	struct RequestResult
 	{
 		bool success = true;
-		DWORD error = WINHTTP_ERROR_BASE;
-		DWORD status{};
-
+		DWORD error{};
 		std::wstring message;
 	};
-#define REQUEST_SUCCEEDED(resError) (resError <= WINHTTP_ERROR_BASE)
-#define REQUEST_FAILED(resError) (resError > WINHTTP_ERROR_BASE)
-#define RETURN_ERROR(result) { result.success = false; result.error = ::GetLastError(); return result; }
+#define SET_ERROR_CODE(errCode) ( errCode = (0 == errCode ? ::GetLastError() : errCode) )
+#define REQUEST_SUCCEEDED(error) (0 == error)
+#define REQUEST_FAILED(error) (error > WINHTTP_ERROR_BASE && resError <= WINHTTP_ERROR_LAST)
+#define RETURN_ERROR(res) { res.success = false; SET_ERROR_CODE(res.error); return res; }
 }

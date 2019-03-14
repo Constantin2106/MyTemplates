@@ -36,6 +36,8 @@ namespace http
 		(err == ERROR_WINHTTP_SECURE_CERT_DATE_INVALID)	||	\
 		(err == ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE)	||	\
 		(err == ERROR_WINHTTP_SECURE_CHANNEL_ERROR))
+
+#define IS_WINHTTP_ERROR(err)(err > WINHTTP_ERROR_BASE && err <= WINHTTP_ERROR_LAST)
 }
 
 // Get size of array

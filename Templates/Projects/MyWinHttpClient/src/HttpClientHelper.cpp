@@ -25,41 +25,80 @@ namespace http
 		LPVOID statusInfo,
 		DWORD statusInfoLength)
 	{
-		if (WINHTTP_CALLBACK_FLAG_SECURE_FAILURE == status)
+		auto reqResult = reinterpret_cast<RequestResult*>(context);
+		if (!reqResult)
+			return;
+
+		reqResult->success = false;
+		auto statInf = *(static_cast<DWORD*>(statusInfo));
+
+		switch(status)
 		{
+		case WINHTTP_CALLBACK_FLAG_SECURE_FAILURE:
 #pragma region  Temporary Console Log
-#ifdef _DEBUG
-			std::cout << std::endl << std::endl << "Secure failure" << std::endl;
-			auto stInfo = *(static_cast<DWORD*>(statusInfo));
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
-			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
-				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
-#endif // _DEBUG
+//#ifdef _DEBUG
+//			std::cout << std::endl << std::endl << "Secure failure" << std::endl;
+//			auto stInfo = *(static_cast<DWORD*>(statusInfo));
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
+//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
+//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
+//#endif // _DEBUG
 #pragma endregion
-
-			auto reqResult = reinterpret_cast<RequestResult*>(context);
-			if (!reqResult)
-				return;
-
-			auto stat = *(static_cast<DWORD*>(statusInfo));
-			reqResult->success = false;
 
 			for (auto& element : statusToError)
 			{
-				reqResult->status = stat & element.first ? element.second : 0;
-				if (reqResult->status)
+				reqResult->error = statInf & element.first ? element.second : 0;
+				if (reqResult->error)
 					break;
+			}
+			break;
+
+		case WINHTTP_CALLBACK_STATUS_RESOLVING_NAME:
+			reqResult->error = ::GetLastError();
+			break;
+
+		}
+	}
+
+	static void GetErrorMessage(RequestResult* reqResult)
+	{
+		// Receive the system message
+		LPWSTR buffer{};
+		HMODULE hModule{};
+
+		if (IS_WINHTTP_ERROR(reqResult->error))
+		{
+			hModule = LoadLibrary(_T("wininet.dll"));
+		}
+		/*else if ()
+		{
+			// TODO: Load appropriate lib
+		}*/
+		if (hModule)
+		{
+			auto nTCHARs = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE,
+				hModule,
+				reqResult->error,
+				MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+				(LPWSTR)&buffer,
+				0,
+				NULL);
+			FreeLibrary(hModule);
+			if (nTCHARs)
+			{
+				reqResult->message.assign(_T("Error code: ") + std::to_wstring(reqResult->error) + _T('\t'));
+				reqResult->message.append(buffer, nTCHARs - 2); // -2 to remove \r\n symbols
 			}
 		}
 	}
@@ -120,12 +159,13 @@ namespace http
 			auto callbackSet = ::WinHttpSetStatusCallback(
 									hRequest,
 									reinterpret_cast<WINHTTP_STATUS_CALLBACK>(statusCallback),
-									WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, NULL);
+									WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, NULL);
 
 			if (WINHTTP_INVALID_STATUS_CALLBACK == callbackSet)
 			{
+				// TODO: ???
 				reqResult->success = false;
-				reqResult->error = ::GetLastError();
+				SET_ERROR_CODE(reqResult->error);
 				return false;
 			}
 		}
@@ -140,10 +180,16 @@ namespace http
 									sendReq.context);
 		if (reqResult)
 		{
-			// TODO: Here need check if sendReq.context has RequestResult type
-			// Because any variable can be passed here.
 			reqResult->success = succeeded;
-			reqResult->error = ::GetLastError();
+			//TODO: Temporarry error code
+			auto err = ::GetLastError();
+			SET_ERROR_CODE(reqResult->error);
+
+			if (reqResult->error)
+			{
+				// Receive the system message
+				GetErrorMessage(reqResult);
+			}
 		}
 
 		return succeeded;
@@ -246,15 +292,14 @@ namespace http
 				return false;
 			}
 
-
+			auto data = reinterpret_cast<PCHAR>(content.data());
+			answer.append(data, data + downloadedData);
 			
-			answer.append(reinterpret_cast<PCHAR>(content.data()), reinterpret_cast<PCHAR>(content.data()) + downloadedData);
 			if (dataSize != downloadedData)
 			{
+				// TODO: ???
 				return false;
 			}
-			
-
 		}
 
 		// Convert string to wstring
