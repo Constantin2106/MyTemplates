@@ -3,6 +3,7 @@
 #include <vld.h>
 
 #include "src\Singleton.h"
+#include "src\StdSingleton.h"
 
 #include <conio.h>
 #include <iostream>
