@@ -13,7 +13,7 @@ namespace http
 		RequestData m_request;
 
 		std::wstring m_headers;
-		std::string m_answer;
+		std::string m_content;
 
 	public:
 		void SetParam(RequestData&& _rqData)
@@ -67,7 +67,7 @@ namespace http
 				RETURN_ERROR(result);
 			}
 
-			if (!HttpReadAnswer(hRequest, m_answer, result.message))
+			if (!HttpReadAnswer(hRequest, m_content, result.message))
 			{
 				RETURN_ERROR(result);
 			}
@@ -85,9 +85,9 @@ namespace http
 		std::wstring GetHeaders() { return m_headers; }
 		std::wistringstream GetHeadersAsStrings() { return std::wistringstream(m_headers); }
 
-		bool IsAnswerEmpty() { return m_answer.empty(); }
-		std::string GetAnswer() { return m_answer; }
-		std::istringstream GetAnswerAsStrings() { return std::istringstream(m_answer); }
+		bool IsContentEmpty() { return m_content.empty(); }
+		std::string GetContent() { return m_content; }
+		std::istringstream GetContentAsStrings() { return std::istringstream(m_content); }
 	};
 
 
@@ -121,18 +121,18 @@ namespace http
 		return m_pImpl->GetHeadersAsStrings();
 	}
 
-	bool HttpClient::IsAnswerEmpty()
+	bool HttpClient::IsContentEmpty()
 	{
-		return m_pImpl->IsAnswerEmpty();
+		return m_pImpl->IsContentEmpty();
 	}
 
-	std::string HttpClient::GetAnswer()
+	std::string HttpClient::GetContent()
 	{
-		return m_pImpl->GetAnswer();
+		return m_pImpl->GetContent();
 	}
 
-	std::istringstream HttpClient::GetAnswerAsStrings()
+	std::istringstream HttpClient::GetContentAsStrings()
 	{
-		return m_pImpl->GetAnswerAsStrings();
+		return m_pImpl->GetContentAsStrings();
 	}
 }

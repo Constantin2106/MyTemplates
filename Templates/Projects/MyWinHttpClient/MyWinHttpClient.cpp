@@ -50,13 +50,34 @@ int main()
     RequestData rqData;
 
 	//rqData.connect.server.assign(_T("www.microsoft.com"));
-	/*rqData.connect.server.assign(_T("www.price.moyo.ua"));
+	/*rqData.connect.server.assign(_T("price.moyo.ua"));
 	rqData.createReq.objName.assign(_T("/outofstock.xml"));*/
-    rqData.connect.server.assign(_T("www.kmp.ua"));
-    rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));
+    /*rqData.connect.server.assign(_T("www.kmp.ua"));
+    rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));*/
 	//rqData.createReq.objName.assign(_T("wp-json/wp/v2/posts")); 
-	rqData.createReq.requestFlags = FLAGS(UNSECURE);
+	//rqData.createReq.requestFlags = FLAGS(UNSECURE);
     //rqData._reqHeaders._headers = ;
+
+	std::wcout << _T("Server name: ");
+	{
+		std::wstring sName{};
+		std::wcin >> sName;
+		rqData.connect.server.assign(std::move(sName));
+	}
+
+	std::wcout << _T("Object name: ");
+	{
+		std::wstring objName{};
+		std::wcin >> objName;
+		rqData.createReq.objName.assign(std::move(objName));
+	}
+
+	std::wcout << _T("Use a secure connection (y/n)? ");
+	{
+		wchar_t secure{};
+		std::wcin >> secure;
+		rqData.createReq.requestFlags = ('y' == secure) ? FLAGS(SECURE) : FLAGS(UNSECURE);
+	}
 
     client.SetParam(std::move(rqData));
     auto res = client.SyncRequest();
@@ -79,29 +100,49 @@ int main()
         std::wcout << wstr << std::endl;
     }
 
-    if(client.IsAnswerEmpty())
+    if(client.IsContentEmpty())
     {
 		Exit("Answer empty");
     }
 
-	setlocale(LC_ALL, "rus");
-	std::string str;
-    std::istringstream answers = client.GetAnswerAsStrings();
-    printf("-------------- Response contents --------------\n");
-    while(std::getline(answers, str, ','))
-    {
-        std::cout << str << std::endl;
-    }
-
-	std::istringstream content = client.GetAnswerAsStrings();
-	std::ofstream fout("Content.txt");
-	while (std::getline(content, str, ','))
+	std::wcout << std::endl << _T("Output content in console (y/n)? ");
 	{
-		fout << str << std::endl;
+		wchar_t cOut{};
+		std::wcin >> cOut; std::cout << std::endl;
+
+		if ('y' == cOut)
+		{
+			setlocale(LC_ALL, "rus");
+			std::string str;
+			std::istringstream answers = client.GetContentAsStrings();
+			printf("-------------- Response contents --------------\n");
+			while (std::getline(answers, str, ','))
+			{
+				std::cout << str << std::endl;
+			}
+		}
 	}
 
-	fout.close();
+	std::wcout << std::endl << _T("Save content in file (y/n)? ");
+	{
+		wchar_t sFile{};
+		std::wcin >> sFile; std::cout << std::endl;
 
+		if ('y' == sFile)
+		{
+			std::string str;
+			std::istringstream content = client.GetContentAsStrings();
+			std::ofstream fout("Content.txt");
+			while (std::getline(content, str, ','))
+			{
+				fout << str << std::endl;
+			}
+
+			fout.close();
+		}
+	}
+
+	std::wcout << _T("Press any key to exit...");
     _getch();
 
     return 0;

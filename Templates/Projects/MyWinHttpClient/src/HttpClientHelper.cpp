@@ -7,6 +7,7 @@
 
 namespace http
 {
+	// Mapping status flags to winhttp errors
 	static const std::array<std::pair<DWORD, DWORD>, 8> statusToError({
 		std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED,			ERROR_WINHTTP_SECURE_CERT_REV_FAILED),
 		std::make_pair<DWORD, DWORD>(WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT,				ERROR_WINHTTP_SECURE_INVALID_CERT),
@@ -29,45 +30,74 @@ namespace http
 		if (!reqResult)
 			return;
 
-		reqResult->success = false;
-		auto statInf = *(static_cast<DWORD*>(statusInfo));
+		DWORD statInf{};
+		auto& error = reqResult->error;
+		if(statusInfo)
+			statInf = *(static_cast<DWORD*>(statusInfo));
 
 		switch(status)
 		{
-		case WINHTTP_CALLBACK_FLAG_SECURE_FAILURE:
+		case WINHTTP_CALLBACK_FLAG_RESOLVE_NAME:
+			//error = ::GetLastError();						// This case isn't error
+			break;
+		case WINHTTP_CALLBACK_FLAG_CONNECT_TO_SERVER:
+			break;
+		case WINHTTP_CALLBACK_FLAG_SEND_REQUEST:
+			break;
+		case WINHTTP_CALLBACK_FLAG_RECEIVE_RESPONSE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_CLOSE_CONNECTION:
+			break;
+		case WINHTTP_CALLBACK_FLAG_HANDLES:
+			break;
+		case WINHTTP_CALLBACK_FLAG_DETECTING_PROXY:
+			break;
+		case WINHTTP_CALLBACK_FLAG_REDIRECT:
+			break;
+		case WINHTTP_CALLBACK_FLAG_INTERMEDIATE_RESPONSE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_SECURE_FAILURE:			// This case is error
 #pragma region  Temporary Console Log
-//#ifdef _DEBUG
-//			std::cout << std::endl << std::endl << "Secure failure" << std::endl;
-//			auto stInfo = *(static_cast<DWORD*>(statusInfo));
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
-//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
-//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
-//#endif // _DEBUG
+			//#ifdef _DEBUG
+			//			std::cout << std::endl << std::endl << "Secure failure" << std::endl;
+			//			auto stInfo = *(static_cast<DWORD*>(statusInfo));
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_REVOKED" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CA" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_CN_INVALID" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_CERT_DATE_INVALID" << std::endl;
+			//			if (stInfo & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR)
+			//				std::cout << std::endl << "WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR" << std::endl;
+			//#endif // _DEBUG
 #pragma endregion
-
+			reqResult->success = false;
 			for (auto& element : statusToError)
 			{
-				reqResult->error = statInf & element.first ? element.second : 0;
-				if (reqResult->error)
+				error = (statInf & element.first) ? 
+							element.second : 0;
+				if (error)
 					break;
 			}
 			break;
-
-		case WINHTTP_CALLBACK_STATUS_RESOLVING_NAME:
-			reqResult->error = ::GetLastError();
+		case WINHTTP_CALLBACK_FLAG_SENDREQUEST_COMPLETE:
 			break;
-
+		case WINHTTP_CALLBACK_FLAG_HEADERS_AVAILABLE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_DATA_AVAILABLE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_READ_COMPLETE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_WRITE_COMPLETE:
+			break;
+		case WINHTTP_CALLBACK_FLAG_REQUEST_ERROR:			// This case is error
+			break;
 		}
 	}
 
