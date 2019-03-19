@@ -81,13 +81,13 @@ namespace http
 			return result;
 		}
 
-		bool IsHeadersEmpty() { return m_headers.empty(); }
-		std::wstring GetHeaders() { return m_headers; }
-		std::wistringstream GetHeadersAsStrings() { return std::wistringstream(m_headers); }
+		bool IsHeadersEmpty() const { return m_headers.empty(); }
+		std::wstring GetHeaders() const { return m_headers; }
+		std::wistringstream GetHeadersAsStrings() const { return std::wistringstream(m_headers); }
 
-		bool IsContentEmpty() { return m_content.empty(); }
-		std::string GetContent() { return m_content; }
-		std::istringstream GetContentAsStrings() { return std::istringstream(m_content); }
+		bool IsContentEmpty() const { return m_content.empty(); }
+		std::string GetContent() const { return m_content; }
+		std::istringstream GetContentAsStrings() const { return std::istringstream(m_content); }
 	};
 
 
@@ -106,32 +106,32 @@ namespace http
 		return m_pImpl->syncRequest();
 	}
 
-	bool HttpClient::IsHeadersEmpty()
+	bool HttpClient::IsHeadersEmpty() const
 	{
 		return m_pImpl->IsHeadersEmpty();
 	}
 
-	std::wstring HttpClient::GetHeaders()
+	std::wstring HttpClient::GetHeaders() const
 	{
 		return m_pImpl->GetHeaders();
 	}
 
-	std::wistringstream HttpClient::GetHeadersAsStrings()
+	std::wistringstream HttpClient::GetHeadersAsStrings() const
 	{
 		return m_pImpl->GetHeadersAsStrings();
 	}
 
-	bool HttpClient::IsContentEmpty()
+	bool HttpClient::IsContentEmpty() const
 	{
 		return m_pImpl->IsContentEmpty();
 	}
 
-	std::string HttpClient::GetContent()
+	std::string HttpClient::GetContent() const
 	{
 		return m_pImpl->GetContent();
 	}
 
-	std::istringstream HttpClient::GetContentAsStrings()
+	std::istringstream HttpClient::GetContentAsStrings() const
 	{
 		return m_pImpl->GetContentAsStrings();
 	}

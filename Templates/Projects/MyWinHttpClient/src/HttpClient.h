@@ -14,13 +14,13 @@ namespace http
 		void SetParam(RequestData&& _rqData);
 		RequestResult SyncRequest();
 
-		bool IsHeadersEmpty();
-		std::wstring GetHeaders();
-		std::wistringstream GetHeadersAsStrings();
+		bool IsHeadersEmpty() const;
+		std::wstring GetHeaders() const;
+		std::wistringstream GetHeadersAsStrings() const;
 
-		bool IsContentEmpty();
-		std::string GetContent();
-		std::istringstream GetContentAsStrings();
+		bool IsContentEmpty() const;
+		std::string GetContent() const;
+		std::istringstream GetContentAsStrings() const;
 
 	private:
 		class Impl;

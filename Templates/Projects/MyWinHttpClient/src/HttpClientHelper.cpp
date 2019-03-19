@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <array>
+#include <assert.h>
 
 #include "HttpClientHelper.h"
 
@@ -136,7 +137,7 @@ namespace http
 		}
 	}
 
-	bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession)
+	bool HttpOpenSyncSession(const SessionData& session, HINTERNET& hSession) noexcept
 	{
 		hSession = ::WinHttpOpen(
 			session.agent.c_str(),
@@ -148,7 +149,7 @@ namespace http
 		return NULL != hSession;
 	}
 
-	bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect)
+	bool HttpConnectToServer(const HINTERNET hSession, const ConnectData& connect, HINTERNET& hConnect) noexcept
 	{
 		hConnect = ::WinHttpConnect(
 			hSession,
@@ -158,7 +159,7 @@ namespace http
 		return NULL != hConnect;
 	}
 
-	bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest)
+	bool HttpCreateRequest(const HINTERNET hConnect, const CreateRequest& createReq, HINTERNET& hRequest) noexcept
 	{
 		hRequest = ::WinHttpOpenRequest(
 			hConnect,
@@ -172,7 +173,7 @@ namespace http
 		return NULL != hRequest;
 	}
 
-	bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders)
+	bool HttpAddHeaders(const HINTERNET& hRequest, const RequestHeaders& reqHeaders) noexcept
 	{
 		return TRUE == ::WinHttpAddRequestHeaders(
 			hRequest,
@@ -228,7 +229,7 @@ namespace http
 		return succeeded;
 	}
 
-	bool HttpWaitResponse(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
+	bool HttpWaitResponse(const HINTERNET hRequest, LPVOID reserved/* = NULL*/) noexcept
 	{
 		return TRUE == ::WinHttpReceiveResponse(hRequest, reserved);
 	}
@@ -275,7 +276,7 @@ namespace http
 
 		if (bResult)
 		{
-			headers.assign(reinterpret_cast<PTCHAR>(buffer.data()));
+			headers.assign(reinterpret_cast<wchar_t*>(buffer.data()));
 		}
 
 		return TRUE == bResult;
@@ -335,18 +336,10 @@ namespace http
 			}
 		}
 
-		// Convert string to wstring
-		//int wchars_num = MultiByteToWideChar(CP_UTF8, 0, msgBody.c_str(), -1, NULL, 0);
-		//wchar_t* wstr = new wchar_t[wchars_num];
-		//wchars_num = MultiByteToWideChar(CP_UTF8, 0, msgBody.c_str(), -1, wstr, wchars_num);
-		//std::wstring _data;
-		//_data.assign(wstr);
-		//delete[] wstr;
-
 		return false;
 	}
 
-	bool HttpCloseSession(HINTERNET& hSession, HINTERNET& hCconnect, HINTERNET& hRequest)
+	bool HttpCloseSession(HINTERNET& hSession, HINTERNET& hCconnect, HINTERNET& hRequest) noexcept
 	{
 		bool isClosed{};
 
@@ -363,48 +356,48 @@ namespace http
 	}
 }
 
-std::string ByteArrayToString(const BYTE bytes[], std::size_t n)
-{
-    std::ostringstream stm;
-    //stm << std::hex << std::uppercase;
-
-    for (std::size_t i = 0; i < n; ++i)
-        //stm << std::setw(2) << std::setfill('0') << unsigned(bytes[i]);
-        stm << bytes[i];// << bytes[++i];
-
-    return stm.str();
-}
-
-std::string WstringToString(std::wstring wstr)
-{
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130(v=vs.85).aspx
-    const auto sz = ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
-    std::vector<char> vec(sz);
-    ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), vec.data(), (int)vec.size(), nullptr, nullptr);
-    return { vec.begin(), vec.end() };
-}
 // Convert a wide Unicode string to an UTF8 string
-std::string utf8_encode(const std::wstring &wstr)
+std::string WstringToString(const std::wstring& wstr)
 {
-	if (wstr.empty()) return std::string();
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-	std::string strTo(size_needed, 0);
-	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	if (wstr.empty()) 
+		return std::string();
+
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130(v=vs.85).aspx
+	const auto size_needed = ::WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	std::string strTo(size_needed, '\0');
+	::WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
 	return strTo;
 }
-
 // Convert an UTF8 string to a wide Unicode String
-std::wstring utf8_decode(const std::string &str)
+std::wstring StringToWstring(const std::string& str)
 {
-	if (str.empty()) return std::wstring();
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	if (str.empty()) 
+		return std::wstring();
+	int size_needed = ::MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
 	std::wstring wstrTo(size_needed, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+	::MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
 	return wstrTo;
+}
+
+std::wstring BSTRToWstring(const BSTR bstr)
+{
+	assert(nullptr != bstr);
+	std::wstring wstr(bstr, ::SysStringLen(bstr));
+	return wstr;
 }
 std::string BSTRToString(const BSTR bstr)
 {
-    return WstringToString(bstr);
+	std::wstring wstr = BSTRToWstring(bstr);
+	return WstringToString(wstr);
+}
+BSTR WstringToBSTR(const std::string& wstr)
+{
+	return ::SysAllocStringLen((BSTR)(wstr.data()), wstr.size());
+}
+BSTR StringToBSTR(const std::string& str)
+{
+	std::wstring wstr = StringToWstring(str);
+	return WstringToBSTR(str);
 }
 
 #include <codecvt>
@@ -425,11 +418,5 @@ std::wstring Str2Wstr(const std::string& str)
 	return converterX.from_bytes(str);
 }
 
-//std::wstring Utf8ToUtf16(const std::string& str)
-//{
-//	std::wstring_convert<std::codecvt_utf16<wchar_t>> converter;
-//	std::wstring wstr = converter.from_bytes(str);
-//	return wstr;
-//}
 
 

@@ -18,32 +18,10 @@
 
 int main()
 {
-    //int x[100];
-    //auto s = getSize(x);
+	/*std::wstring w_str(L"Test Òåñò");
+	std::string s_tr = WstringToString(w_str);
 
-    //--------------------------------------------------------//
-    /*const BYTE bytes[] = { 72, 101, 108, 108, 111 };
-    std::string strBytes = ByteArrayToString(bytes);
-    std::cout << strBytes << std::endl;
-
-    const BSTR bstr = ::SysAllocString(L"Hello world");
-    std::string strn = BSTRToString(bstr);
-    std::cout << strn << std::endl;
-    ::SysFreeString(bstr);
-
-    const std::wstring widestr(L"Hello again");
-    std::string charstr = WstringToString(widestr);
-    std::cout << charstr << std::endl;*/
-
-	/*std::wstring widestr(L"ÉÖÓÊÅÍ");
-	std::string strng = Wstr2Str(widestr);
-	std::cout << strng << std::endl;*/
-	/*std::wstring wmsg(L"QWERTY");
-	size_t size = wmsg.size() + 1;
-	std::string msg(size, {});
-	size_t n = wcstombs(&msg[0], wmsg.c_str(), size);
-	std::cout << msg << std::endl;*/
-    //--------------------------------------------------------//
+	BSTR bstr = ::SysAllocString(L"Test Òåñò");*/
 
 	using namespace http;
 
