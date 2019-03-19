@@ -10,9 +10,10 @@
 #include "src\HttpClient.h"
 #include "src\HttpClientHelper.h"
 
-#define Exit(message)					\
-	std::cout << message << std::endl;	\
-	_getch();							\
+#define Exit(message)								\
+	std::wcout << message << std::endl;				\
+	std::wcout << _T("Press any key to exit...");	\
+	_getch();										\
 	return{}
 
 int main()
@@ -51,7 +52,7 @@ int main()
 
 	//rqData.connect.server.assign(_T("www.microsoft.com"));
 	/*rqData.connect.server.assign(_T("price.moyo.ua"));
-	rqData.createReq.objName.assign(_T("/outofstock.xml"));*/
+	rqData.createReq.objName.assign(_T("/oplata_chastyami.xml"));*/
     /*rqData.connect.server.assign(_T("www.kmp.ua"));
     rqData.createReq.objName.assign(_T("/wp-json/wp/v2/users/1"));*/
 	//rqData.createReq.objName.assign(_T("wp-json/wp/v2/posts")); 
@@ -84,12 +85,12 @@ int main()
 	if (!res.success)
 	{
 		std::wcout << std::endl << res.message.c_str() << std::endl;
-		Exit("");
+		Exit(L"");
 	}
 
     if(client.IsHeadersEmpty())
     {
-		Exit("Headers empty");
+		Exit(L"Headers empty");
     }
     std::wstring wstr;
     std::wistringstream wheaders = client.GetHeadersAsStrings();
@@ -102,23 +103,25 @@ int main()
 
     if(client.IsContentEmpty())
     {
-		Exit("Answer empty");
+		Exit(L"Content is empty");
     }
 
 	std::wcout << std::endl << _T("Output content in console (y/n)? ");
 	{
 		wchar_t cOut{};
-		std::wcin >> cOut; std::cout << std::endl;
+		std::wcin >> cOut; std::wcout << std::endl;
 
 		if ('y' == cOut)
 		{
-			setlocale(LC_ALL, "rus");
+			auto locale = setlocale(LC_ALL, "");
 			std::string str;
-			std::istringstream answers = client.GetContentAsStrings();
+			std::wstring wstr;
+			std::istringstream content = client.GetContentAsStrings();
 			printf("-------------- Response contents --------------\n");
-			while (std::getline(answers, str, ','))
+			while (std::getline(content, str, ','))
 			{
-				std::cout << str << std::endl;
+				wstr = Str2Wstr(str);
+				std::wcout << wstr << std::endl;
 			}
 		}
 	}
@@ -126,7 +129,7 @@ int main()
 	std::wcout << std::endl << _T("Save content in file (y/n)? ");
 	{
 		wchar_t sFile{};
-		std::wcin >> sFile; std::cout << std::endl;
+		std::wcin >> sFile; std::wcout << std::endl;
 
 		if ('y' == sFile)
 		{

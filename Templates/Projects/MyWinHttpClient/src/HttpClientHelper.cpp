@@ -101,7 +101,7 @@ namespace http
 		}
 	}
 
-	static void GetErrorMessage(RequestResult* reqResult)
+	static void GetErrorMessage(RequestResult* const reqResult)
 	{
 		// Receive the system message
 		LPWSTR buffer{};
@@ -115,6 +115,7 @@ namespace http
 		{
 			// TODO: Load appropriate lib
 		}*/
+		
 		if (hModule)
 		{
 			auto nTCHARs = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_HMODULE,
@@ -129,6 +130,8 @@ namespace http
 			{
 				reqResult->message.assign(_T("Error code: ") + std::to_wstring(reqResult->error) + _T('\t'));
 				reqResult->message.append(buffer, nTCHARs - 2); // -2 to remove \r\n symbols
+
+				::LocalFree(buffer);
 			}
 		}
 	}
@@ -225,7 +228,7 @@ namespace http
 		return succeeded;
 	}
 
-	bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
+	bool HttpWaitResponse(const HINTERNET hRequest, LPVOID reserved/* = NULL*/)
 	{
 		return TRUE == ::WinHttpReceiveResponse(hRequest, reserved);
 	}
@@ -278,13 +281,13 @@ namespace http
 		return TRUE == bResult;
 	}
 
-	bool HttpReadAnswer(const HINTERNET& hRequest, std::string& answer, std::wstring& errorMessage)
+	bool HttpReadData(const HINTERNET& hRequest, std::string& msgBody, std::wstring& errorMessage)
 	{
 		DWORD dataSize{};
 		DWORD downloadedData{};
 		std::vector<BYTE> content{};
 
-		answer.clear();
+		msgBody.clear();
 		errorMessage.assign(_T("Succeeded\n"));
 
 		while (true)
@@ -300,7 +303,7 @@ namespace http
 
 			if (0 == dataSize)
 			{
-				if (answer.size())
+				if (msgBody.size())
 				{
 					return true;
 				}
@@ -323,7 +326,7 @@ namespace http
 			}
 
 			auto data = reinterpret_cast<PCHAR>(content.data());
-			answer.append(data, data + downloadedData);
+			msgBody.append(data, data + downloadedData);
 			
 			if (dataSize != downloadedData)
 			{
@@ -333,9 +336,9 @@ namespace http
 		}
 
 		// Convert string to wstring
-		//int wchars_num = MultiByteToWideChar(CP_UTF8, 0, answer.c_str(), -1, NULL, 0);
+		//int wchars_num = MultiByteToWideChar(CP_UTF8, 0, msgBody.c_str(), -1, NULL, 0);
 		//wchar_t* wstr = new wchar_t[wchars_num];
-		//wchars_num = MultiByteToWideChar(CP_UTF8, 0, answer.c_str(), -1, wstr, wchars_num);
+		//wchars_num = MultiByteToWideChar(CP_UTF8, 0, msgBody.c_str(), -1, wstr, wchars_num);
 		//std::wstring _data;
 		//_data.assign(wstr);
 		//delete[] wstr;
@@ -408,7 +411,7 @@ std::string BSTRToString(const BSTR bstr)
 #include <clocale>
 std::string Wstr2Str(const std::wstring& wstr)
 {
-	std::setlocale(LC_ALL, "");
+	setlocale(LC_ALL, "");
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
 

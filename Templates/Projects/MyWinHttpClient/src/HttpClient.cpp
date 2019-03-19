@@ -57,7 +57,7 @@ namespace http
 				RETURN_ERROR(result);
 			}
 
-			if (!HttpWaitAnswer(hRequest))
+			if (!HttpWaitResponse(hRequest))
 			{
 				RETURN_ERROR(result);
 			}
@@ -67,7 +67,7 @@ namespace http
 				RETURN_ERROR(result);
 			}
 
-			if (!HttpReadAnswer(hRequest, m_content, result.message))
+			if (!HttpReadData(hRequest, m_content, result.message))
 			{
 				RETURN_ERROR(result);
 			}

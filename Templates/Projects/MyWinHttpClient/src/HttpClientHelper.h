@@ -16,15 +16,15 @@ namespace http
 
 	bool HttpSendRequest(const HINTERNET hRequest, const SendRequest& sendReq, HttpCallback callback = nullptr);
 
-	bool HttpWaitAnswer(const HINTERNET hRequest, LPVOID _reserved = {});
+	bool HttpWaitResponse(const HINTERNET hRequest, LPVOID reserved = {});
 
-	bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& _headers);
+	bool HttpReadHeaders(const HINTERNET& hRequest, const ResponseHeaders& resHeaders, std::wstring& headers);
 
-	bool HttpDataAvailable(HINTERNET _hRequest);
+	bool HttpDataAvailable(HINTERNET hRequest);
 
-	bool HttpReadAnswer(const HINTERNET& hRequest, std::string& _answer, std::wstring& _errorMessage);
+	bool HttpReadData(const HINTERNET& hRequest, std::string& data, std::wstring& errorMessage);
 
-	bool HttpCloseSession(HINTERNET& _hSession, HINTERNET& _hConnect, HINTERNET& _hRequest);
+	bool HttpCloseSession(HINTERNET& hSession, HINTERNET& hConnect, HINTERNET& hRequest);
 
 
 #define IS_SECURE_FAILURE(err) (							\
