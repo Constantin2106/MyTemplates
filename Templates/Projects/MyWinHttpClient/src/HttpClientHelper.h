@@ -47,18 +47,16 @@ std::size_t getSize(T(&)[N]) noexcept
    return N;
 }
 
+// Convert wstring <-> string with WinApi functions
+std::string WstringToString(const std::wstring& wstr, const UINT codePage = CP_UTF8);
+std::wstring StringToWstring(const std::string& str, const UINT codePage = CP_UTF8);
+
 // Convert BSTR to string/wstring and vice versa
 std::wstring BSTRToWstring(const BSTR bstr);
-std::string BSTRToString(const BSTR bstr);
-BSTR WstringToBSTR(const std::string& wstr);
-BSTR StringToBSTR(const std::string& str);
+std::string BSTRToString(const BSTR bstr, const UINT codePage = CP_UTF8);
+BSTR WstringToBSTR(const std::wstring& wstr);
+BSTR StringToBSTR(const std::string& str, const UINT codePage = CP_UTF8);
 
-
-std::string WstringToString(const std::wstring& wstr);
-std::wstring StringToWstring(const std::string& str);
-
-// Convert wstring to string
+// Convert wstring <-> string with std functions
 std::string Wstr2Str(const std::wstring& wstr);
 std::wstring Str2Wstr(const std::string& str);
-
-//std::wstring Utf8ToUtf16(const std::string& str);

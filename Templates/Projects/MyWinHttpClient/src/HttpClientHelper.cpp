@@ -356,26 +356,27 @@ namespace http
 	}
 }
 
-// Convert a wide Unicode string to an UTF8 string
-std::string WstringToString(const std::wstring& wstr)
+// Convert a wide Unicode string to an string
+std::string WstringToString(const std::wstring& wstr, const UINT codePage/* = CP_UTF8*/)
 {
 	if (wstr.empty()) 
 		return std::string();
 
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130(v=vs.85).aspx
-	const auto size_needed = ::WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	const auto size_needed = ::WideCharToMultiByte(codePage, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
 	std::string strTo(size_needed, '\0');
-	::WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	::WideCharToMultiByte(codePage, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
 	return strTo;
 }
-// Convert an UTF8 string to a wide Unicode String
-std::wstring StringToWstring(const std::string& str)
+// Convert an string to a wide Unicode String
+std::wstring StringToWstring(const std::string& str, const UINT codePage/* = CP_UTF8*/)
 {
 	if (str.empty()) 
 		return std::wstring();
-	int size_needed = ::MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-	std::wstring wstrTo(size_needed, 0);
-	::MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+
+	int size_needed = ::MultiByteToWideChar(codePage, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstrTo(size_needed, L'\0');
+	::MultiByteToWideChar(codePage, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
 	return wstrTo;
 }
 
@@ -385,37 +386,42 @@ std::wstring BSTRToWstring(const BSTR bstr)
 	std::wstring wstr(bstr, ::SysStringLen(bstr));
 	return wstr;
 }
-std::string BSTRToString(const BSTR bstr)
+std::string BSTRToString(const BSTR bstr, const UINT codePage/* = CP_UTF8*/)
 {
 	std::wstring wstr = BSTRToWstring(bstr);
-	return WstringToString(wstr);
+	return WstringToString(wstr, codePage);
 }
-BSTR WstringToBSTR(const std::string& wstr)
+BSTR WstringToBSTR(const std::wstring& wstr)
 {
 	return ::SysAllocStringLen((BSTR)(wstr.data()), wstr.size());
 }
-BSTR StringToBSTR(const std::string& str)
+BSTR StringToBSTR(const std::string& str, const UINT codePage/* = CP_UTF8*/)
 {
-	std::wstring wstr = StringToWstring(str);
-	return WstringToBSTR(str);
+	std::wstring wstr = StringToWstring(str, codePage);
+	return WstringToBSTR(wstr);
 }
 
 #include <codecvt>
 #include <clocale>
 std::string Wstr2Str(const std::wstring& wstr)
 {
-	setlocale(LC_ALL, "");
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
+	using convType = std::codecvt<wchar_t, char, std::mbstate_t>;
 
-	return converterX.to_bytes(wstr);
+	static std::locale loc("");
+	static auto& facet = std::use_facet<convType>(loc);
+	static std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t> converter(&facet);
+
+	return converter.to_bytes(wstr);
 }
 std::wstring Str2Wstr(const std::string& str)
 {
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
+	using convType = std::codecvt<wchar_t, char, std::mbstate_t>;
 
-	return converterX.from_bytes(str);
+	static std::locale loc("");
+	static auto& facet = std::use_facet<convType>(loc);
+	static std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t> converter(&facet);
+
+	return converter.from_bytes(str);
 }
 
 

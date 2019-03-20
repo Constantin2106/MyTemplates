@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <iostream>
 #include <fstream>
+#include <locale>
 
 #include <sstream>
 #include "src\HttpClient.h"
@@ -18,10 +19,20 @@
 
 int main()
 {
-	/*std::wstring w_str(L"Test 义耱");
-	std::string s_tr = WstringToString(w_str);
+	/*const std::wstring w_str(L"Test 义耱");
+	std::string s1 = Wstr2Str(w_str);
+	std::string s2 = WstringToString(w_str, CP_ACP);
 
-	BSTR bstr = ::SysAllocString(L"Test 义耱");*/
+	const std::string c_str("Test 义耱");
+	std::wstring w1 = Str2Wstr(c_str);
+	std::wstring w2 = StringToWstring(c_str, CP_ACP);
+
+	BSTR bstr = ::SysAllocString(L"Test 义耱");
+	w1 = BSTRToWstring(bstr);
+	s1 = BSTRToString(bstr, CP_ACP);
+
+	auto bStr1 = WstringToBSTR(w_str);
+	auto bStr2 = StringToBSTR(c_str, CP_ACP);*/
 
 	using namespace http;
 
@@ -73,7 +84,7 @@ int main()
     std::wstring wstr;
     std::wistringstream wheaders = client.GetHeadersAsStrings();
 
-    printf("-------------- Header contents -------------- \n");
+    printf("------------------- Headers ------------------- \n");
     while(std::getline(wheaders, wstr, _TCHAR('\n')))
     {
         std::wcout << wstr << std::endl;
@@ -93,13 +104,11 @@ int main()
 		{
 			auto locale = setlocale(LC_ALL, "");
 			std::string str;
-			std::wstring wstr;
 			std::istringstream content = client.GetContentAsStrings();
-			printf("-------------- Response contents --------------\n");
+			printf("------------------- Content -------------------\n");
 			while (std::getline(content, str, ','))
 			{
-				wstr = Str2Wstr(str);
-				std::wcout << wstr << std::endl;
+				std::wcout << StringToWstring(str) << std::endl;
 			}
 		}
 	}
