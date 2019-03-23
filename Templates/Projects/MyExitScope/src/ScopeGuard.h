@@ -1,15 +1,14 @@
 #pragma once
-//#include "Prepocessor.h"
+
 #include <type_traits>
 #include <utility>
 
-namespace Cis
+namespace SGuard
 {
-	//
 	// ScopeGuard is a general implementation of the "Initialization is
 	// Resource Acquisition" idiom. Basically, it guarantees that a function
 	// is executed upon leaving the currrent scope unless otherwise told.
-	//
+
 	template <class Func>
 	class ScopeGuard
 	{
@@ -20,8 +19,8 @@ namespace Cis
 		ScopeGuard(ScopeGuard&& other);
 		~ScopeGuard();
 
-		ScopeGuard(const ScopeGuard& other) = delete             // Non-copyable
-		ScopeGuard& operator=(const ScopeGuard& other) = delete // Non-copyable
+		ScopeGuard(const ScopeGuard& other) = delete;				// Non-copyable
+		ScopeGuard& operator=(const ScopeGuard& other) = delete;	// Non-copyable
 
 		void Dismiss();
 		void Enforce();
@@ -77,22 +76,20 @@ namespace Cis
 
 	namespace Details
 	{
-		//
 		// Internal use for the macro SCOPE_EXIT below
-		//
+
 		enum ScopeGuardOnExit {};
 
 		template <typename Func>
-		ScopeGuard<typename std::decay<Func>::type>
-			operator+(ScopeGuardOnExit, Func&& function)
+		ScopeGuard<typename std::decay<Func>::type> operator+(ScopeGuardOnExit, Func&& function)
 		{
-			return ScopeGuard<typename std::decay<Func>::type>(
-				std::forward<Func>(function));
+			return ScopeGuard<typename std::decay<Func>::type>(std::forward<Func>(function));
 		}
 	}
 }
 
-#define SCOPE_EXIT \
-auto CIS_ANONYMOUS_VARIABLE(SCOPE_EXIT_STATE) \
-= ::Cis::Details::ScopeGuardOnExit() + [&]()
+//#define SCOPE_EXIT \
+//auto CIS_ANONYMOUS_VARIABLE(SCOPE_EXIT_STATE) \
+//= ::SGuard::Details::ScopeGuardOnExit() + [&]()
+#define SCOPE_EXIT auto sGuard = ::SGuard::Details::ScopeGuardOnExit() + [&]()
 
