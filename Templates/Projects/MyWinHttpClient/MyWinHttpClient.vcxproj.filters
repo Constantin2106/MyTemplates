@@ -4,21 +4,27 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MySingleton.cpp" />
-    <ClCompile Include="src\Singleton.cpp">
+    <ClCompile Include="MyWinHttpClient.cpp" />
+    <ClCompile Include="src\HttpClient.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HttpClientHelper.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
-      <UniqueIdentifier>{28533eb2-a9e0-4841-9337-70bac480ba37}</UniqueIdentifier>
+      <UniqueIdentifier>{daec3a9f-f41d-4a02-bea6-b7d433ac03c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Singleton.h">
+    <ClInclude Include="src\HttpClient.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="src\StdSingleton.h">
+    <ClInclude Include="src\HttpClientHelper.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HttpDataStruct.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
