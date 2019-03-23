@@ -1,4 +1,5 @@
 #pragma once
+
 #include <memory>
 #include <mutex>
 #include <assert.h>
@@ -43,7 +44,7 @@ namespace Singleton
 	class CDerivedSingleton : public CSingleton<CDerivedSingleton>
 	{
 		friend CSingleton<CDerivedSingleton>;
-	}
+	};
 	
 	//auto Instance = CGatesAlertConsumer::Instance();
 }
