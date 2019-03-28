@@ -88,8 +88,6 @@ namespace SGuard
 	}
 }
 
-//#define SCOPE_EXIT \
-//auto CIS_ANONYMOUS_VARIABLE(SCOPE_EXIT_STATE) \
-//= ::SGuard::Details::ScopeGuardOnExit() + [&]()
-#define SCOPE_EXIT auto sGuard = ::SGuard::Details::ScopeGuardOnExit() + [&]()
+#define CONCAT(a, b) a##b
+#define SCOPE_EXIT auto CONCAT(scopeGuard, __COUNTER__) = ::SGuard::Details::ScopeGuardOnExit() + [&]()
 

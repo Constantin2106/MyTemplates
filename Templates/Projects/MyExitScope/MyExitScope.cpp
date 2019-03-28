@@ -36,8 +36,8 @@ int main()
    {
       double* x = new double[10];
 	
-	  auto mc = std::make_unique<MyClass>();
-	 // MyClass* mc = new MyClass();
+	  //auto mc = std::make_unique<MyClass>();
+	  MyClass* mc = new MyClass();
 
       /*CleanScope(
          std::cout << "Free allocated memory" << std::endl << std::endl;
@@ -53,15 +53,15 @@ int main()
 
          std::cout << "Exit from scope" << std::endl;
       );*/
-
+	  
 	  SCOPE_EXIT
 	  {
 		 std::cout << "Free allocated memory" << std::endl << std::endl;
 		 if (nullptr != x)
 			delete[] x;
 
-		 //std::cout << "Call destructor" << std::endl << std::endl;
-		 //delete mc;
+		 std::cout << "Call destructor" << std::endl << std::endl;
+		 delete mc;
 
 		 std::cout << __FUNCTION__ << std::endl;
 		 std::cout << __FUNCSIG__ << std::endl << std::endl;
