@@ -43,7 +43,7 @@ namespace Singleton
 	class CDerivedSingleton : public CSingleton<CDerivedSingleton>
 	{
 		friend CSingleton<CDerivedSingleton>;
-	}
+	};
 	
 	//auto Instance = CGatesAlertConsumer::Instance();
 }
