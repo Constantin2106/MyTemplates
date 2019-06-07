@@ -15,5 +15,8 @@
     <ClInclude Include="src\Callback.h">
       <Filter>Src</Filter>
     </ClInclude>
+    <ClInclude Include="src\FunctionRef.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
