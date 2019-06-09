@@ -17,10 +17,18 @@ std::mutex mut;
         lock(mut);                  \
     msg                             \
 }
+#define OutMessage(cmn, val)		\
+{									\
+	std::unique_lock<std::mutex>	\
+		lock(mut);					\
+	std::cout <<					\
+		cmn << val <<				\
+	std::endl;						\
+}
 
 int fastFun(int i)
 {
-    Message(std::cout << "fast task " << i << std::endl;)
+	OutMessage("fast task ", i);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     return i;
@@ -28,11 +36,11 @@ int fastFun(int i)
 
 int slowFun(int i)
 {
-    int N = i;
+    int N = 10;
 
     for(int n = 0; n < N; ++n)
     {
-        Message(std::cout << "slow task step " << n << std::endl;)
+		OutMessage("slow task step ", n);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
@@ -45,37 +53,37 @@ int main()
     std::vector<std::future<int>> results;
 
     TaskPool pool;
-    std::future<int> fut;
+    //std::future<int> fut;
 
-    Message(std::cout << "------ Pool size " << pool.Size() << " ------" << std::endl;)
+	OutMessage("------ Pool size ", pool.Size());
 
     int fastTasksNum = pool.Size() * 2;
 
     for(int k = 0; k < fastTasksNum; ++k)
     {
-        fut = pool.AddTask(0, fastFun, k);
+        auto fut = pool.AddTask(0, fastFun, k);
         results.push_back(std::move(fut));
     }
-    Message(std::cout << "------ Added " << fastTasksNum << " fast tasks ------" << std::endl;)
+	Message(std::cout << "------ Added " << fastTasksNum << " fast tasks ------" << std::endl;);
 
-    fut = pool.AddTask(1, slowFun, fastTasksNum);
+	auto fut = pool.AddTask(100, slowFun, 100);
     results.push_back(std::move(fut));
-    Message(std::cout << "------ Added " << "1" << " slow task ------" << std::endl;)
+	OutMessage("------ Added 1", " slow task ------");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
 
-    Message(std::cout << "------ Before destroying. Task number " << pool.TaskNumber() << std::endl;)
-        pool.Destroy();
-    Message(std::cout << "------ After destroying. Task number " << pool.TaskNumber() << std::endl;)
-    Message(std::cout << "------ The pool has been destroyed ------" << std::endl;)
+	OutMessage("------ Before destroying. Task number ", pool.TaskNumber());
+    pool.Destroy();
+	OutMessage("------ After destroying. Task number ", pool.TaskNumber())
+	OutMessage("------ The pool has been destroyed ------", "");
 
     for(int k = fastTasksNum, n = fastTasksNum + 5; k < n; ++k)
     {
-        fut = pool.AddTask(0, fastFun, k);
+		auto fut = pool.AddTask(0, fastFun, k);
         results.push_back(std::move(fut));
     }
-    Message(std::cout << "------ Added else " << "5" << " fast task ------" << std::endl;)
-    Message(std::cout << "------ Final task number " << pool.TaskNumber() << std::endl;)
+	OutMessage("------ Added else 5", " fast task ------");
+	OutMessage("------ Final task number ", pool.TaskNumber());
 
     //int sFuncInd = 10;
     //for (int i = 0; i < 12; ++i)
@@ -103,11 +111,22 @@ int main()
     //   //results.push_back(std::move(fut));
     //}
 
-    /*for (auto && result : results)
-    std::cout << result.get() << ' ';
-    std::cout << std::endl;*/
-
-    _getch();
+	{
+		OutMessage("Total Results number: ", results.size());
+		for (auto && result : results)
+		{
+			try
+			{
+				result.wait();
+				OutMessage("\t\tresult: ", result.get());
+			}
+			catch (const std::exception& e)
+			{
+				OutMessage("\tDon't have the result!\t", e.what());
+			}
+		}
+		std::cout << std::endl;
+	}
 
     return 0;
 

@@ -19,14 +19,20 @@ public:
    using taskFunc = std::function<void()>;
 /*
 Description
-   Delegating constructor
+   TaskPool::TaskPool(bool);
+   Constructor. 
+   Calls the private constructor to force the creation of the instance.
+   Defines the number of a processors core.
+   Creates threads and suspends them until the next task will be added to the queue.
+   Then the one thread will be waked up
+   and the task with max priority retrieved from the task queue and executed.
 
 Arguments
-
+   
 Return
 
 History
-   Created by Kostiantyn Zhelieznov   10/01/2018
+   Created by Created by Kostiantyn Zhelieznov   10/01/2018
 */
    TaskPool();
 
@@ -89,63 +95,59 @@ History
    }
 
 /*
-   Description
-      TaskPool::Size();
+Description
+   TaskPool::Size();
 
-   Arguments
+Arguments
 
-   Return
-      Return number of thread in the pool
+Return
+   Return number of thread in the pool
 
-   History
-      Created by Kostiantyn Zhelieznov   10/01/2018
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
 */
    std::size_t Size();
 
 /*
-   Description
-      TaskPool::TaskNumber();
+Description
+   TaskPool::TaskNumber();
 
-   Arguments
+Arguments
 
-   Return
-      Return number of tasks in the pool queue
+Return
+   Return number of tasks in the pool queue
 
-   History
-      Created by Kostiantyn Zhelieznov   10/01/2018
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
 */
    std::size_t TaskNumber();
 
 /*
-   Description
-      TaskPool::Destroy(); Immediately destroys the task pool by calling finish function.
+Description
+   TaskPool::Destroy(); Immediately destroys the task pool by calling finish function.
 
-   Arguments
+Arguments
 
-   Return
+Return
 
-   History
-      Created by Kostiantyn Zhelieznov   10/01/2018
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
 */
    void Destroy() { finish(); }
 
 private:
-   /*
-   Description
-      TaskPool::TaskPool(bool);
-      Constructor. Defines the number of a processors core.
-      Creates threads and suspends them until the next task will be added to the queue.
-      Then the one thread will be waked up
-      and the task with max priority retrieved from the task queue and executed.
+/*
+Description
+   This private constructor is invoked by delegating constructor to force the creation of the instance.
 
-   Arguments
-      It needs some kind of argument in order to be called from the delegating constructor.
+Arguments
+	Needs some kind of argument to be different from the delegating constructor.
 
-   Return
+Return
 
-   History
-      Created by Created by Kostiantyn Zhelieznov   10/01/2018
-   */
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
+*/
    TaskPool(bool _finish);
 
    TaskPool(const TaskPool&) = delete;
@@ -154,17 +156,17 @@ private:
    TaskPool&& operator= (TaskPool&&) = delete;
 
 /*
-   Description
-      TaskPool::finish();    
-      Sets the stop variable and wake up all threads to be finished them.
-      Clears the task queue and waits while all executed threads will be finished
+Description
+   TaskPool::finish();    
+   Sets the stop variable and wake up all threads to be finished them.
+   Clears the task queue and waits while all executed threads will be finished
 
-   Arguments
+Arguments
 
-   Return
+Return
 
-   History
-      Created by Kostiantyn Zhelieznov   10/01/2018
+History
+   Created by Kostiantyn Zhelieznov   10/01/2018
 */
    void finish();
 
