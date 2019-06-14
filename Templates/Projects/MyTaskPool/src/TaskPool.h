@@ -68,14 +68,14 @@ History
    Created by Kostiantyn Zhelieznov   10/01/2018
 */
    template<class F, class... Args>
-   auto AddTask(UINT _priority, F&& func, Args&&... args)
+   auto AddTask(const UINT _priority, F&& func, Args&&... args)
    {
-      using ret_type = typename std::result_of_t<F(Args...)>;
+	  using namespace std;
+      using R = typename std::result_of_t<F(Args...)>;
 
-      auto task = std::make_shared<std::packaged_task<ret_type()>>
-         (std::bind(std::forward<F>(func), std::forward<Args>(args)...));
+      auto task = make_shared<packaged_task<R()>>(bind(forward<F>(func), forward<Args>(args)...));
 
-      std::future<ret_type> fut{};
+      std::future<R> fut{};
 
       {
          std::unique_lock<std::mutex> lock(m_map_mutex);
