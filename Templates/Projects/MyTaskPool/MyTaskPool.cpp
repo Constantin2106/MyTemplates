@@ -53,7 +53,6 @@ int main()
     std::vector<std::future<int>> results;
 
     TaskPool pool;
-    //std::future<int> fut;
 
 	OutMessage("------ Pool size ", pool.Size());
 
@@ -73,7 +72,7 @@ int main()
     std::this_thread::sleep_for(std::chrono::milliseconds(150));
 
 	OutMessage("------ Before destroying. Task number ", pool.TaskNumber());
-    pool.Destroy();
+    //pool.Destroy();
 	OutMessage("------ After destroying. Task number ", pool.TaskNumber())
 	OutMessage("------ The pool has been destroyed ------", "");
 
@@ -117,8 +116,16 @@ int main()
 		{
 			try
 			{
-				result.wait();
-				OutMessage("\t\tresult: ", result.get());
+				//result.wait();
+				auto r = result.get();
+				if (r >= 0)
+				{
+					OutMessage("\t\tresult: ", r);
+				}
+				else
+				{
+					OutMessage("\t\tinvalid result: ", r);
+				}
 			}
 			catch (const std::exception& e)
 			{

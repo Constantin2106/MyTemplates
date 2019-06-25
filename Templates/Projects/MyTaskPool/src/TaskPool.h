@@ -73,16 +73,16 @@ History
 	  using namespace std;
       using R = typename std::result_of_t<F(Args...)>;
 
-      auto task = make_shared<packaged_task<R()>>(bind(forward<F>(func), forward<Args>(args)...));
+	  std::future<R> fut{};
+	  // If the pool is stopped, the addition of the task is forbidden.
+	  if (m_finish)
+		  return fut;
 
-      std::future<R> fut{};
+      auto task = make_shared<packaged_task<R()>>(bind(forward<F>(func), forward<Args>(args)...));
 
       {
          std::unique_lock<std::mutex> lock(m_map_mutex);
 
-         // If the pool is stopped, the addition of the task is forbidden.
-         if (m_finish)
-             return fut;
 
          fut = task->get_future();
          // Add task with priority
