@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="MyObjectHolder.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Example">
+      <UniqueIdentifier>{107423eb-73bf-4398-ab9e-cdb04165f2d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{03e225f5-0365-4ca0-acb2-c05fa4a893ad}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="example\Data.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="example\Days.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="example\Months.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Holder.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
