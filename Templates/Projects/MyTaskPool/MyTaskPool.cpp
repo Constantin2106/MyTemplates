@@ -81,7 +81,7 @@ int main()
 		auto fut = pool.AddTask(0, fastFun, k);
         results.push_back(std::move(fut));
     }
-	OutMessage("------ Added else 5", " fast task ------");
+	OutMessage("------ Added another 5", " fast task ------");
 	OutMessage("------ Final task number ", pool.TaskNumber());
 
     //int sFuncInd = 10;
