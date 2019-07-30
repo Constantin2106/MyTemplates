@@ -28,20 +28,21 @@ std::mutex mut;
 
 int fastFun(int i)
 {
-	OutMessage("fast task ", i);
+	OutMessage("started fast task ", i);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
+	OutMessage("finished fast task ", i);
     return i;
 }
 
 int slowFun(int i)
 {
     int N = 10;
+	OutMessage("!!!slow task started!!! ", N);
 
     for(int n = 0; n < N; ++n)
     {
 		OutMessage("slow task step ", n);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     return i;
@@ -69,12 +70,11 @@ int main()
     results.push_back(std::move(fut));
 	OutMessage("------ Added 1", " slow task ------");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
-
+    /*std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	OutMessage("------ Before destroying. Task number ", pool.TaskNumber());
-    //pool.Destroy();
+    pool.Destroy();
 	OutMessage("------ After destroying. Task number ", pool.TaskNumber())
-	OutMessage("------ The pool has been destroyed ------", "");
+	OutMessage("------ The pool has been destroyed ------", "");*/
 
     for(int k = fastTasksNum, n = fastTasksNum + 5; k < n; ++k)
     {
@@ -135,6 +135,7 @@ int main()
 		std::cout << std::endl;
 	}
 
+	system("pause");
     return 0;
 
 }

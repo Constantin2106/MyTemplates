@@ -64,23 +64,22 @@ std::size_t TaskPool::TaskNumber()
 
 void TaskPool::finish()
 {
-   {
-      //std::unique_lock<std::mutex> lock(m_map_mutex);
-      m_finish = true;
-	  m_thread_control.notify_all();
+	{
+		std::unique_lock<std::mutex> lock(m_map_mutex);
 
-	  for (auto& thread : m_threads)
-	  {
-		  if (thread.joinable())
-		  {
-			  thread.join();
-		  }
-		  else
-		  {
-			  // ???
-		  }
-	  }
-
-      m_tasks.clear();
-   }
+		m_finish = true;
+		m_tasks.clear();
+		m_thread_control.notify_all();
+	}
+	for (auto& thread : m_threads)
+	{
+		if (thread.joinable())
+		{
+			thread.join();
+		}
+		else
+		{
+			// ???
+		}
+	}
 }
