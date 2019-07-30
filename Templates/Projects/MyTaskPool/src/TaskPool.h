@@ -25,7 +25,7 @@ Description
    Defines the number of a processors core.
    Creates threads and suspends them until the next task will be added to the queue.
    Then the one thread will be waked up
-   and the task with max priority retrieved from the task queue and executed.
+   and the task with max priority is retrieved from the task queue and executed.
 
 Arguments
    
@@ -71,18 +71,16 @@ History
    auto AddTask(const UINT _priority, F&& func, Args&&... args)
    {
 	  using namespace std;
-      using R = typename std::result_of_t<F(Args...)>;
+      using R = typename result_of_t<F(Args...)>;
 
-	  std::future<R> fut{};
+	  future<R> fut{};
 	  // If the pool is stopped, the addition of the task is forbidden.
 	  if (m_finish)
 		  return fut;
 
       auto task = make_shared<packaged_task<R()>>(bind(forward<F>(func), forward<Args>(args)...));
-
       {
-         std::unique_lock<std::mutex> lock(m_map_mutex);
-
+         unique_lock<mutex> lock(m_map_mutex);
 
          fut = task->get_future();
          // Add task with priority
@@ -174,10 +172,10 @@ History
    std::multimap<UINT, taskFunc,             // The <priority, function> multimap
       std::greater<UINT>> m_tasks;	         // More priority tasks always are on the top of the map
 
-   std::mutex m_map_mutex;						   // The mutex is used to lock of tasks map when the task is added
+   std::mutex m_map_mutex;					 // The mutex is used to lock of tasks map when the task is added
    std::condition_variable m_thread_control; // The condition variable used to suspend/resume of threads
 
-   std::atomic_bool m_finish;         		   // When true, the pool will be finished
+   std::atomic_bool m_finish;         		 // When true, the pool will be finished
 };
 
 

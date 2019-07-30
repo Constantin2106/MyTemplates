@@ -17,7 +17,6 @@ TaskPool::TaskPool() : TaskPool(false)
 				while (true)
 				{
 					taskFunc task;
-
 					{
 						std::unique_lock<std::mutex> lock(m_map_mutex);
 
@@ -33,7 +32,6 @@ TaskPool::TaskPool() : TaskPool(false)
 						task = std::move(it->second);
 						m_tasks.erase(it);
 					}
-
 					task();
 				}
 			});
