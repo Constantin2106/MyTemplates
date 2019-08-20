@@ -37,7 +37,7 @@ public:
 
     void Accept(FileService& service) override 
     { 
-        std::cout << "Call server" << std::endl; 
+        std::cout << "Call service" << std::endl; 
         
         service.Visit(*this); 
 
@@ -55,7 +55,7 @@ public:
 
     void Accept(FileService& service) override 
     { 
-        std::cout << "Call server" << std::endl; 
+        std::cout << "Call service" << std::endl; 
 
         service.Visit(*this);
 

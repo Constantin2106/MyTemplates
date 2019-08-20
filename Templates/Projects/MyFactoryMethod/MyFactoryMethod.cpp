@@ -14,6 +14,10 @@ class Class1
 public:
     Class1(int x, double y) : m_x(x), m_y(y)
     {};
+	~Class1()
+	{
+		m_x = m_y = 0;
+	}
 
     std::string GetClassName()
     {
@@ -39,6 +43,10 @@ class Class2
 public:
     Class2(std::string type) : m_type(type)
     {};
+	~Class2()
+	{
+		m_type.clear();
+	}
 
     std::string GetClassName()
     {
@@ -59,22 +67,29 @@ void TemplateFactoryTest()
 {
 
     auto cl1 = Factory<Class1, int, double>::Create(5, 2.6);
-    auto cl2 = Factory<Class2, std::string>::Create("type");
+    auto cl2 = Factory<Class2, std::string>::Create("type 1");
     cout << cl1->GetClassName().c_str() << '\t' << cl1->GetX() << '\t' << cl1->GetY() << endl;
     cout << cl2->GetClassName().c_str() << '\t' << cl2->GetType().c_str() << endl;
 
     auto* cl11 = FactoryFun<Class1, int, double>(50, 12.6);
-    auto* cl21 = FactoryFun<Class2, std::string>("type");
+    auto* cl21 = FactoryFun<Class2, std::string>("type 2");
     cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << endl;
     cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << endl;
     
     _getch();
 
-    delete cl1;
+	Factory<Class1>::Destroy(cl1);
+	Factory<Class2>::Destroy(cl2);
+
+	DesroyFun(cl11);
+	DesroyFun(cl21);
+
+
+    /*delete cl1;
     delete cl2;
 
     delete cl11;
-    delete cl21;
+    delete cl21;*/
 }
 
 void FactoryMethodTest()

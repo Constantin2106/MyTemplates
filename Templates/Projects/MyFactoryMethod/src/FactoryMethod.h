@@ -19,9 +19,14 @@ History
    Created by Kostiantyn Zhelieznov   09/01/2018
 */
 template<typename T, typename... Arg>
-T* FactoryFun(Arg... args)
+T* FactoryFun(Arg&&... args)
 {
    return new T(forward<Arg>(args)...);
+}
+template<typename T>
+void DesroyFun(T* t)
+{
+	delete t;
 }
 
 /*
@@ -41,9 +46,13 @@ template<typename T, typename... Arg>
 class Factory
 {
 public:
-   static T* Create(Arg... args)
+   static T* Create(Arg&&... args)
    {
       return new T(forward<Arg>(args)...);
+   }
+   static void Destroy(T* t)
+   {
+	   delete t;
    }
 };
 

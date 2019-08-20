@@ -4,7 +4,7 @@ TaskPool::TaskPool() : TaskPool(false)
 {
 	// Calc the optimal number of threads
 	SYSTEM_INFO sysInfo;
-	GetSystemInfo(&sysInfo);
+	::GetSystemInfo(&sysInfo);
 	DWORD threadNum = sysInfo.dwNumberOfProcessors;// * 2;
 
 	// Create threads
