@@ -3,24 +3,22 @@
 #include <map>
 #include <memory>
 
+
 template<typename Base>
 class GenericFactory
 {
-	class BaseType
+	struct BaseType
 	{
-	public:
 		virtual ~BaseType() {}
 		virtual std::shared_ptr<Base> Create() const = 0;
 	};
 
 	template<typename Derived>
-	class DerivedType : public BaseType
+	struct DerivedType : public BaseType
 	{
-	public:
 		std::shared_ptr<Base> Create() const override final
 		{
 			return std::static_pointer_cast<Base>(std::make_shared<Derived>());
-			//return std::shared_ptr<Base>(new Derived());
 		}
 	};
 
@@ -36,7 +34,6 @@ public:
 			
 		m_Factories[name] = std::static_pointer_cast<BaseType>(std::make_shared<DerivedType<Derived>>());
 		return true;
-		//m_Factories[name] = std::shared_ptr<BaseType>(new DerivedType<Derived>());
 	}
 	
 	std::shared_ptr<Base> Create(std::wstring const& name)
@@ -44,4 +41,3 @@ public:
 		return m_Factories[name]->Create();
 	}
 };
-
