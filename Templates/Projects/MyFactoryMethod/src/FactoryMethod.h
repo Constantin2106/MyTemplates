@@ -21,7 +21,7 @@ History
 template<typename T, typename... Arg>
 T* FactoryFun(Arg&&... args)
 {
-   return new T(forward<Arg>(args)...);
+   return new T(std::forward<Arg>(args)...);
 }
 template<typename T>
 void DesroyFun(T* t)
@@ -48,7 +48,7 @@ class Factory
 public:
    static T* Create(Arg&&... args)
    {
-      return new T(forward<Arg>(args)...);
+      return new T(std::forward<Arg>(args)...);
    }
    static void Destroy(T* t)
    {

@@ -6,8 +6,7 @@
 #include <iostream>
 
 #include "src\FactoryMethod.h"
-
-using namespace std;
+#include "src\GenericFactory.h"
 
 class Class1
 {
@@ -63,18 +62,63 @@ private:
     std::string m_type;
 };
 
+
+class Furniture
+{
+	std::wstring m_Name;
+
+public:
+	virtual ~Furniture() {}
+	virtual void Show() = 0;
+};
+class Table : public Furniture
+{
+public:
+	void Show() override
+	{
+		std::wcout << L"The big black wooden table" << std::endl;
+	}
+};
+class Chair : public Furniture
+{
+public:
+	void Show() override
+	{
+		std::wcout << L"The old rocking chair" << std::endl;
+	}
+};
+
+void GenericFactoryTest()
+{
+	GenericFactory<Furniture> factory;
+
+	factory.Register<Table>(L"Table");
+	factory.Register<Chair>(L"Chair");
+
+	auto f1 = factory.Create(L"Table");
+	auto f2 = factory.Create(L"Chair");
+	auto f3 = factory.Create(L"Chair");
+
+	std::wcout << std::endl;
+	f1->Show();
+	f2->Show();
+	f3->Show();
+	std::wcout << std::endl;
+
+}
+
 void TemplateFactoryTest()
 {
 
     auto cl1 = Factory<Class1, int, double>::Create(5, 2.6);
     auto cl2 = Factory<Class2, std::string>::Create("type 1");
-    cout << cl1->GetClassName().c_str() << '\t' << cl1->GetX() << '\t' << cl1->GetY() << endl;
-    cout << cl2->GetClassName().c_str() << '\t' << cl2->GetType().c_str() << endl;
+    std::cout << cl1->GetClassName().c_str() << '\t' << cl1->GetX() << '\t' << cl1->GetY() << std::endl;
+	std::cout << cl2->GetClassName().c_str() << '\t' << cl2->GetType().c_str() << std::endl;
 
     auto* cl11 = FactoryFun<Class1, int, double>(50, 12.6);
     auto* cl21 = FactoryFun<Class2, std::string>("type 2");
-    cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << endl;
-    cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << endl;
+	std::cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << std::endl;
+	std::cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << std::endl;
     
     _getch();
 
@@ -99,14 +143,14 @@ void FactoryMethodTest()
 
     TBaseClass* obj3 = TBaseClass::CreateObject("11");
 
-    cout << (obj1 != nullptr ? obj1->GetClassName().c_str() : "no obj1") << endl;
-    cout << (obj2 != nullptr ? obj2->GetClassName().c_str() : "no obj2") << endl;
-    cout << (obj3 != nullptr ? obj3->GetClassName().c_str() : "no obj3") << endl;
+	std::cout << (obj1 != nullptr ? obj1->GetClassName().c_str() : "no obj1") << std::endl;
+	std::cout << (obj2 != nullptr ? obj2->GetClassName().c_str() : "no obj2") << std::endl;
+	std::cout << (obj3 != nullptr ? obj3->GetClassName().c_str() : "no obj3") << std::endl;
 
     obj2->Initialize();
 
     for(size_t n = 0, size = obj2->GetSize(); n < size; n++)
-        cout << obj2->GetData(n) << endl;
+		std::cout << obj2->GetData(n) << std::endl;
 
     _getch();
 
@@ -119,10 +163,12 @@ void FactoryMethodTest()
 
 int main()
 {
-    TemplateFactoryTest();
-    cout << endl;
-    FactoryMethodTest();
+	GenericFactoryTest();
 
-    return 0;
+    /*TemplateFactoryTest();
+    cout << endl;
+    FactoryMethodTest();*/
+
+	return{};
 }
 
