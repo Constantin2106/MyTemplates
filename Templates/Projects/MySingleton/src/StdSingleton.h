@@ -6,40 +6,36 @@
 
 namespace Singleton
 {
-	template <typename T>
+	template <typename T, typename... Arg>
 	class CSingleton
 	{
-		static std::once_flag     m_onceFlag;
-		static std::unique_ptr<T> m_instance;
+		static std::once_flag     m_OnceFlag;
+		static std::unique_ptr<T> m_Instance;
 
 	public:
-		static T& Instance();
+		static auto Instance(Arg&&... arg)
+		{
+			std::call_once(m_OnceFlag, [&] {
+				assert(!m_Instance);
+				m_Instance.reset(new T(std::forward<Arg>(arg)...));
+				});
 
-		virtual ~CSingleton(void){}
+			assert(m_Instance);
+
+			return m_Instance.get();
+		}
+
+		virtual ~CSingleton() {}
 
 	protected:
-		CSingleton(){}
+		CSingleton() {}// = delete;
 	};
 
-	template <typename T>
-	std::unique_ptr<T> CSingleton<T>::m_instance;
+	template <typename T, typename... Arg>
+	std::unique_ptr<T> CSingleton<T, Arg...>::m_Instance;
 
-	template <typename T>
-	std::once_flag CSingleton<T>::m_onceFlag;
-
-	template <typename T>
-	T& CSingleton<T>::Instance()
-	{
-		std::call_once(m_onceFlag, [] 
-						{
-							assert(!m_instance);
-							m_instance.reset(new T);
-						});
-
-		assert(m_instance);
-
-		return *m_instance;
-	}
+	template <typename T, typename... Arg>
+	std::once_flag CSingleton<T, Arg...>::m_OnceFlag;
 
 	class CDerivedSingleton : public CSingleton<CDerivedSingleton>
 	{

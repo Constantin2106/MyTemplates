@@ -16,7 +16,12 @@ class CSingleton_1 : public CSingleton<CSingleton_1>
 	std::string m_class_name{ "Singleton_1" };
 
 public:
+	~CSingleton_1()
+	{
+		m_class_name.clear();
+	}
 	auto ClassName() { return m_class_name; }
+	void SetClassName(std::string name) { m_class_name = name; }
 };
 class CSingleton_2 : public CSingleton<CSingleton_2>
 {
@@ -55,16 +60,22 @@ int main()
 	/*auto sMyers = CreateSingleton<Singleton_2>();
 	cout << "Class name: " << sMyers.ClassName().c_str() << endl;*/
 
-	auto singl_1 = CSingleton_1::Instance();
-	cout << "Class name: " << singl_1.ClassName().c_str() << endl;
+	auto singl_11 = CSingleton_1::Instance();
+	cout << "singl_11\n	Class name: " << singl_11->ClassName().c_str() << "\tAddr: " << singl_11 << endl;
+	auto singl_12 = CSingleton_1::Instance();
+	cout << "singl_12\n	Class name: " << singl_12->ClassName().c_str() << "\tAddr: " << singl_12 << endl;
 
-	auto singl_2 = CSingleton_2::Instance();
-	cout << "Class name: " << singl_2.ClassName().c_str() << endl;
+	singl_11->SetClassName("Class_11");
+	cout << "singl_11\n	Class name: " << singl_11->ClassName().c_str() << "\tAddr: " << &singl_11 << endl;
+	cout << "singl_12\n	Class name: " << singl_12->ClassName().c_str() << "\tAddr: " << &singl_12 << endl;
+
+	/*auto singl_21 = CSingleton_2::Instance();
+	cout << "singl_21\n	Class name: " << singl_21.ClassName().c_str() << "\tAddr: " << &singl_21 << endl;
 
 	auto singl_22 = CSingleton_2::Instance();
-	cout << "Class name: " << singl_22.ClassName().c_str() << endl;
+	cout << "singl_22\n	Class name: " << singl_22.ClassName().c_str() << "\tAddr: " << &singl_22 << endl;*/
 
-    _getch();
+    //_getch();
 
     return 0;
 }
