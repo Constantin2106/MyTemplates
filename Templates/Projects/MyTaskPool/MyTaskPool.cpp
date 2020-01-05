@@ -57,7 +57,7 @@ int main()
 
 	OutMessage("------ Pool size ", pool.Size());
 
-    int fastTasksNum = pool.Size() * 2;
+    int fastTasksNum = static_cast<int>(pool.Size() * 2);
 
     for(int k = 0; k < fastTasksNum; ++k)
     {

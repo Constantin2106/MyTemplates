@@ -15,7 +15,7 @@ public:
     {};
 	~Class1()
 	{
-		m_x = m_y = 0;
+        m_x = 0;  m_y = 0.;
 	}
 
     std::string GetClassName()
@@ -120,7 +120,7 @@ void TemplateFactoryTest()
 	std::cout << cl11->GetClassName().c_str() << '\t' << cl11->GetX() << '\t' << cl11->GetY() << std::endl;
 	std::cout << cl21->GetClassName().c_str() << '\t' << cl21->GetType().c_str() << std::endl;
     
-    _getch();
+    auto c = _getch();
 
 	Factory<Class1>::Destroy(cl1);
 	Factory<Class2>::Destroy(cl2);
@@ -152,7 +152,7 @@ void FactoryMethodTest()
     for(size_t n = 0, size = obj2->GetSize(); n < size; n++)
 		std::cout << obj2->GetData(n) << std::endl;
 
-    _getch();
+    auto c = _getch();
 
     obj2->Free();
 

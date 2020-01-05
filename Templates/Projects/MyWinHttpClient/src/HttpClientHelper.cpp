@@ -393,7 +393,7 @@ std::string BSTRToString(const BSTR bstr, const UINT codePage/* = CP_UTF8*/)
 }
 BSTR WstringToBSTR(const std::wstring& wstr)
 {
-	return ::SysAllocStringLen((BSTR)(wstr.data()), wstr.size());
+	return ::SysAllocStringLen((BSTR)(wstr.data()), static_cast<UINT>(wstr.size()));
 }
 BSTR StringToBSTR(const std::string& str, const UINT codePage/* = CP_UTF8*/)
 {
@@ -409,7 +409,7 @@ std::string Wstr2Str(const std::wstring& wstr)
 
 	static std::locale loc("");
 	static auto& facet = std::use_facet<convType>(loc);
-	static std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t> converter(&facet);
+	static std::wstring_convert<std::remove_reference_t<decltype(facet)>, wchar_t> converter(&facet);
 
 	return converter.to_bytes(wstr);
 }
@@ -419,7 +419,7 @@ std::wstring Str2Wstr(const std::string& str)
 
 	static std::locale loc("");
 	static auto& facet = std::use_facet<convType>(loc);
-	static std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t> converter(&facet);
+	static std::wstring_convert<std::remove_reference_t<decltype(facet)>, wchar_t> converter(&facet);
 
 	return converter.from_bytes(str);
 }

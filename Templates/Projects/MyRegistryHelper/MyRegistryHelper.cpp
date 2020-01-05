@@ -1,7 +1,7 @@
 // RegistryHelper.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "vld.h"
+#include <vld.h>
 #include <iostream>
 
 #include "src/RegistryTools.h"

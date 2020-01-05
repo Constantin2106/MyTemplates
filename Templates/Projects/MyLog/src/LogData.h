@@ -20,19 +20,19 @@ enum class Severity
 // Defines log location
 struct Location
 {
-    const char* file;
-    int         line;
+    const char* file = nullptr;
+    int         line = 0;
 };
 
 // Full logging message payload.
 using Timestamp = std::chrono::system_clock::time_point;
 struct Record
 {
-    Severity    severity;
+    Severity    severity{};
     Location    location;
     Timestamp   timestamp;
     uintptr_t   threadId;
-    const char* message;
+    const char* message = nullptr;
 
     Record()
     {
