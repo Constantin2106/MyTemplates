@@ -44,7 +44,7 @@ int main()
 
 	TComparator<int, &Less> l;
 	TComparator<int, &Equal> e;
-	TComparator<bool, &LEqu> le;
+	//TComparator<bool, &LEqu> le;
 
 	std::cout << l(5, 7) << std::endl;
 	std::cout << l(7, 5) << std::endl;
