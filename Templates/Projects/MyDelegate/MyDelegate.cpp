@@ -81,7 +81,39 @@ size_t getPtrSize(char *ptr)
     return sizeof(ptr);
 }
 
-#include "src\MyDelegate.h"
+#include "src/MyDelegate.h"
+#include "src/GenericDelegate.h"
+int Inc(int i)
+{
+    std::cout << "Call free function Inc\n";
+    return i + 1;
+}
+int Add(int a, int b)
+{
+    std::cout << "Call free function Add\n";
+    return a + b;
+}
+
+class Class
+{
+    int m_Val{};
+
+public:
+    Class() = default;
+    auto Inc(int i)
+    {
+        std::cout << "Call member function Inc\n";
+
+        m_Val = ++i;
+        return m_Val;
+    }
+    auto Add(int a, int b)
+    {
+        std::cout << "Call member function Add\n";
+        return a + b;
+    }
+};
+
 
 int main()
 {
@@ -141,7 +173,7 @@ int main()
     Decrementor decrementor;
     int d = (decrementor.*mydelegate)(i);
 
-    std::cout << "My Delegate" << "\n" << i << "\n" << d << std::endl;
+    std::cout << "My GDelegate" << "\n" << i << "\n" << d << std::endl;
 #pragma endregion
 
 #pragma region SimpleDelegate
@@ -149,11 +181,48 @@ int main()
     Decrementor decr;
     int x = (decr.*del)(i + 1);
 
-    std::cout << "Simple Delegate" << "\n" << i << "\n" << x << std::endl;
+    std::cout << "Simple GDelegate" << "\n" << i << "\n" << x << std::endl;
 #pragma endregion
 
+#pragma region Generalized delegate
+    using namespace GenericDelegate;
+    std::list<GDelegate<int(int)>> Incs;
+    std::list<GDelegate<int(int, int)>> Adds;
 
-    _getch();
+    Class* cl = new Class();
+
+    Incs.push_back(GD_BIND(&Inc));
+    Incs.push_back(GD_BIND(&Class::Inc, cl));
+
+    Adds.push_back(GD_BIND(&Class::Add, cl));
+    Adds.push_back(GD_BIND(&Add));
+
+    i = 1; int c = 0;
+    for (auto f : Incs)
+    {
+        c += f ? f(i) : 0;
+        std::cout << "c = " << c << std::endl;
+    }
+    c = 0;
+    for (auto f : Adds)
+    {
+        c += f ? f(i, 5) : 0;
+        std::cout << "c = " << c << std::endl;
+    }
+
+    auto dlgFreeInc(GD_BIND(&Inc));
+    auto dlgMembInc(GD_BIND(&Class::Inc, cl));
+    auto dlgFreeAdd(GD_BIND(&Add));
+    auto dlgMemAdd(GD_BIND(&Class::Add, cl));
+    std::cout << dlgFreeInc(2) << std::endl;
+    std::cout << dlgMembInc(20) << std::endl;
+    std::cout << dlgFreeAdd(3, 1) << std::endl;
+    std::cout << dlgMemAdd(30, 1) << std::endl;
+
+    delete cl;
+#pragma endregion
+
+    //_getch();
 
     return 0;
 }
