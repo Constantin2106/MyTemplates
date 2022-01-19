@@ -2,3 +2,5 @@ Templates/.vs/
 Templates/Bin/
 Templates/Int/
 *.user
+/Templates/_bin
+/Templates/_int
