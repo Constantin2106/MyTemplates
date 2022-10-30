@@ -10,14 +10,18 @@
 #include <unordered_map>
 #include <random>
 #include <chrono>
+#include <map>
+
 
 #include "src/TSContainer.h"
 
 int main()
 {
     std::cout << "Main thread id = " << std::this_thread::get_id() << std::endl;
+    
     {
-        TSContainer<std::vector<double>> container;
+        std::cout << "<------- std::vector ------->" << std::endl;
+        TSContainer<std::vector<double>> container(10, -1);
 
         //std::thread t1(
         auto a1 = std::async(std::launch::async,
@@ -46,8 +50,8 @@ int main()
                 }
             });
 
-        /*t1.join();
-        t2.join();*/
+        //t1.join();
+        //t2.join();
 
         a1.wait();
         a2.wait();
@@ -62,18 +66,19 @@ int main()
         std::cout << std::endl << std::endl;
     }
     {
+        std::cout << "<------- std::unordered_map ------->" << std::endl;
         TSContainer<std::unordered_map<int, int>> container;
 
         auto a1 = std::async(std::launch::async,
             [&]()
             {
                 auto value = 10;
-                std::random_device r;
+                std::random_device r("123");
                 for (int i = 0; i < 9; ++i)
                 {
                     auto key = r();
                     container->emplace(key, value);
-                    ::Sleep(200);
+                    ::Sleep(500);
                 }
             });
 
@@ -81,7 +86,7 @@ int main()
             [&]()
             {
                 auto value = 100;
-                std::random_device r;
+                std::random_device r("456");
                 for (int i = 0; i < 9; ++i)
                 {
                     auto key = r();
@@ -89,7 +94,7 @@ int main()
                     ::Sleep(200);
                 }
             });
-        
+
         a1.wait();
         a2.wait();
 
@@ -97,8 +102,9 @@ int main()
             std::cout << "\t" << el.first << "\t" << el.second << std::endl;
 
         std::cout << std::endl << std::endl;
-    }
+    } 
     {
+        std::cout << "<------- std::unordered_multimap ------->" << std::endl;
         TSContainer<std::unordered_multimap<std::thread::id, long long>> container;
         auto start = std::chrono::high_resolution_clock::now();
 
@@ -133,5 +139,38 @@ int main()
             std::cout << "\t" << el.first << "\t" << el.second << std::endl;
 
         std::cout << std::endl << std::endl;
+    }
+    {
+        std::cout << "<------- std::map ------->" << std::endl;
+        TSContainer<std::map<std::string, std::pair<std::string, int>>> safeMap;
+        auto func = [](decltype(safeMap)& safeMap)
+        {
+            safeMap->emplace("apple", std::make_pair<std::string, int>("fruit", 0));
+            safeMap->emplace("potato", std::make_pair<std::string, int>("vegetable", 0));
+
+            for (size_t i = 0; i < 10000; ++i)
+            {
+                safeMap->at("apple").second++;
+                safeMap->at("potato").second++;
+            }
+
+            //auto const readOnlySafeMap = safeMap;
+            std::cout << "potato is " << safeMap->at("potato").first <<
+                " " << safeMap->at("potato").second <<
+                ", apple is " << safeMap->at("apple").first <<
+                " " << safeMap->at("apple").second << std::endl;
+        };
+    
+        std::vector<std::thread> threads(10);
+
+        for (auto& i : threads)
+        {
+            i = std::move(std::thread([&]() 
+                {
+                    func(safeMap);
+                }));
+        }
+
+        for (auto& i : threads) i.join();
     }
 }
