@@ -47,7 +47,7 @@ public:
     TSContainer() : mContainer(std::make_unique<T>()) {}
 
     template<typename... Args>
-    TSContainer(Args... args) : mContainer(std::make_unique<T>(args...)) {}
+    TSContainer(Args&&... args) : mContainer(std::make_unique<T>(std::forward<Args>(args)...)) {}
     ~TSContainer() {}
 
     auto operator->()
