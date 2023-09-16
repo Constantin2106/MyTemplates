@@ -4,3 +4,4 @@ Templates/Int/
 *.user
 /Templates/_bin
 /Templates/_int
+/Templates/Projects/MyGenericWrapper/x64
