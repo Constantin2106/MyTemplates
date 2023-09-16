@@ -1,6 +1,6 @@
 // MySingleton.cpp : Defines the entry point for the console application.
 //
-#include <vld.h>
+//#include <vld.h>
 
 #include "src\Singleton.h"
 #include "src\StdSingleton.h"
@@ -13,7 +13,12 @@ using namespace Singleton;
 
 class CSingleton_1 : public CSingleton<CSingleton_1>
 {
+	friend class CSingleton<CSingleton_1>;
 	std::string m_class_name{ "Singleton_1" };
+protected:
+	CSingleton_1() {}
+	/*CSingleton_1(const CSingleton_1&) = delete;
+	CSingleton_1& operator=(const CSingleton_1&) = delete;*/
 
 public:
 	~CSingleton_1()
@@ -65,14 +70,15 @@ int main()
 	/*auto sMyers = CreateSingleton<Singleton_2>();
 	cout << "Class name: " << sMyers.ClassName().c_str() << endl;*/
 
-	/*auto singl_11 = CSingleton_1::Instance();
+	cout << "singl_11\n	Class name: " << CSingleton_1::Instance()->ClassName().c_str() << "\tAddr: " << CSingleton_1::Instance() << endl;
+	auto singl_11 = CSingleton_1::Instance();
 	cout << "singl_11\n	Class name: " << singl_11->ClassName().c_str() << "\tAddr: " << singl_11 << endl;
-	auto singl_12 = CSingleton_1::Instance();
+	auto& singl_12 = CSingleton_1::Instance();
 	cout << "singl_12\n	Class name: " << singl_12->ClassName().c_str() << "\tAddr: " << singl_12 << endl;
 
 	singl_11->SetClassName("Class_11");
 	cout << "singl_11\n	Class name: " << singl_11->ClassName().c_str() << "\tAddr: " << singl_11 << endl;
-	cout << "singl_12\n	Class name: " << singl_12->ClassName().c_str() << "\tAddr: " << singl_12 << endl;*/
+	cout << "singl_12\n	Class name: " << singl_12->ClassName().c_str() << "\tAddr: " << singl_12 << endl;
 	
 	{
 		auto singl_21 = CSingleton_2::Instance();
