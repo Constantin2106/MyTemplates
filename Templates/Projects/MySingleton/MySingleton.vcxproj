@@ -96,9 +96,11 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Visual Leak Detector\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\Visual Leak Detector\lib\Win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -147,11 +149,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MySingleton.cpp" />
+    <ClCompile Include="src\Module.cpp" />
     <ClCompile Include="src\Singleton.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Module.h" />
     <ClInclude Include="src\Singleton.h" />
     <ClInclude Include="src\StdSingleton.h" />
+    <ClInclude Include="src\TemplateSingleton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,6 +8,9 @@
     <ClCompile Include="src\Singleton.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Module.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -19,6 +22,12 @@
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="src\StdSingleton.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TemplateSingleton.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Module.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
